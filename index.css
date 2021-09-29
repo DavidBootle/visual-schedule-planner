@@ -25,7 +25,7 @@ html, body {
     display: flex;
     text-align: center;
     justify-content: center;
-    padding-top: 10px;
+    padding-top: 20px;
 }
 
 #viewcontainer {
@@ -87,13 +87,20 @@ html, body {
     border-radius: 5px;
     margin-left: 5px;
     margin-right: 5px;
+    text-align: left;
+    padding: 20px;
 }
 .class-box:hover {
     z-index: 100;
 }
+.class-box.small {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 
 .custombg-blue {
     background-color: #2636c7 !important;
+    color: white;
 }
 .custombg-blue:hover {
     background-color: #1b2585 !important;
@@ -101,15 +108,32 @@ html, body {
 
 .custombg-green {
     background-color: #1a8a23 !important;
+    color: white;
 }
 .custombg-green:hover {
     background-color: #105216 !important;
 }
 
 .custombg-red {
-    
     background-color: #cf3f30 !important;
+    color: white;
 }
 .custombg-red:hover {
     background-color: #85291e !important;
+}
+
+.class-box .class-box-title {
+    font-size: 20px;
+}
+.class-box.small .class-box-title {
+    font-size: 14px;
+}
+.class-box .class-box-subtitle {
+    font-size: 12px;
+    margin-top: -5px;
+    opacity: 80%;
+}
+.class-box.small .class-box-subtitle {
+    font-size: 10px;
+    margin-top: -2px;
 }

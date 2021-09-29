@@ -78,11 +78,33 @@ function draw() {
 
         // create classBox element
         var classBox = $('<div></div>');
-        classBox = classBox.data('class-id', classID);
-        classBox = classBox.addClass('class-box');
-        classBox = classBox.css('height', classBoxHeight);
-        classBox = classBox.addClass('custombg-' + classInfo.color);
-        classBox = classBox.css('z-index', Math.round(99 - classBoxHeight / 100));
+        classBox.data('class-id', classID);
+        classBox.addClass('class-box');
+        classBox.css('height', classBoxHeight);
+        classBox.addClass('custombg-' + classInfo.color);
+        classBox.css('z-index', Math.round(99 - classBoxHeight / 10));
+
+        if (classBoxHeight <= 90) {
+            classBox.addClass('small');
+        }
+
+        // create title element
+        var cbDisplayName = $('<div></div>');
+        cbDisplayName.addClass('class-box-title');
+        cbDisplayName.text(classInfo.displayName);
+        classBox.append(cbDisplayName);
+
+        // create subtitle element
+        var cbClassID = $('<div></div>');
+        cbClassID.addClass('class-box-subtitle');
+        cbClassID.text(classID);
+        classBox.append(cbClassID);
+
+        // create time element
+        var cbTime = $('<div></div>');
+        cbTime.addClass('class-box-subtitle');
+        cbTime.text(parseDecimalTimeToString(classInfo.startTime, false) + ' - ' + parseDecimalTimeToString(classInfo.endTime, false));
+        classBox.append(cbTime);
 
         // draw classBox
         for (var i = 0; i < numOfDays; i++) {
@@ -97,7 +119,6 @@ function draw() {
 
                 // get total heights of all classBoxes on top of it (in the dom), and add their height to the offset
                 var prevSiblings = clone.prevAll('.class-box');
-                console.log(prevSiblings);
                 var totalHeight = 0;
                 for (var k = 0; k < prevSiblings.length; k++) {
                     var sibling = prevSiblings.eq(k);
@@ -177,7 +198,7 @@ function parseTimeStringToDecimal(timeString) {
     return time;
 }
 
-function parseDecimalTimeToString(time) {
+function parseDecimalTimeToString(time, useSpaces = true) {
     var hours = Math.floor(time);
     var minutes = Math.round((time - hours) * 60);
 
@@ -192,8 +213,7 @@ function parseDecimalTimeToString(time) {
     while (minutesString.length < 2) {
         minutesString = '0' + minutesString;
     }
-
-    return `${hoursString}:${minutesString} ${(pm ? 'PM' : 'AM' )}`;
+    return `${hoursString}:${minutesString}${( useSpaces ? ' ' : '' )}${( pm ? 'PM' : 'AM' )}`;
 }
 
 function loadClassInfo() {
