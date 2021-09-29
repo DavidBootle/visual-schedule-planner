@@ -2,8 +2,8 @@
 
 const timesRowWidthMultiplier = 0.08;
 
-var startTime = 8; // 6:30 am
-var endTime = 16; // 4:20 pm
+var startTime = null;
+var endTime = null;
 
 var startInt;
 var endInt;
@@ -45,7 +45,8 @@ function draw() {
 
     // set timebox height
     const heightOfContentBox = $('.dayrow .content').outerHeight();
-    $('.dayrow .content .timebox').css('height', heightOfContentBox / numOfTimeBoxes);
+    const timeboxHeight = heightOfContentBox / numOfTimeBoxes;
+    $('.dayrow .content .timebox').css('height', timeboxHeight);
 
     // TIMEROW
     // set timerow title box height
@@ -60,12 +61,57 @@ function draw() {
     }
 
     // set timebox height
-    $('.timesrow .content .timelabel').css('height', heightOfContentBox / numOfTimeBoxes);
+    $('.timesrow .content .timelabel').css('height', timeboxHeight);
     $('.timesrow .content .timelabel').last().css('height', 0);
+
+    /* note that timeboxHeight is the unit for the number of pixels in an hour */
+    // draw classes
+    for (const classID in classes) {
+        const classInfo = classes[classID];
+        
+        // calculate height
+        const classBoxHeight = (classInfo.endTime - classInfo.startTime) * timeboxHeight;
+
+        // calculate height offset
+        const topOffset = (classInfo.startTime - startInt) * timeboxHeight;
+        const bottomOffset = heightOfContentBox - topOffset;
+
+        // create classBox element
+        var classBox = $('<div></div>');
+        classBox = classBox.data('class-id', classID);
+        classBox = classBox.addClass('class-box');
+        classBox = classBox.css('top', -1 * bottomOffset);
+        classBox = classBox.css('height', classBoxHeight);
+        classBox = classBox.addClass('custombg-' + classInfo.color);
+
+        // draw classBox
+        for (var i = 0; i < numOfDays; i++) {
+            if (classInfo.days[i]) {
+                $(`.dayrow .content`).eq(i).append(classBox.clone());
+            }
+        }
+    }
 }
 
 // determine the start and end integer cutoffs
 function calculateInterval() {
+    // calculate start and end time
+    if (Object.keys(classes).length == 0) {
+        startTime = 8;
+        endTime = 16;
+    } else {
+        for (const classID in classes) {
+            let classInfo = classes[classID];
+            if (classInfo.startTime < startTime || startTime == null) {
+                startTime = classInfo.startTime;
+            }
+            if (classInfo.endTime > endTime || endTime == null) {
+                endTime = classInfo.endTime;
+            }
+        }
+    }
+
+    // get start and end int
     startInt = Math.floor(startTime);
     endInt = Math.ceil(endTime);
 
@@ -123,6 +169,15 @@ function saveClassInfo() {
     window.localStorage.setItem('classes', jsonClassInfo);
 }
 
+function setPreviewBoxColor(prefix) {
+    var colorOption = $(`#${prefix}Color`).val();
+    $('.color-preview-box').attr('class', 'input-group-text color-preview-box custombg-' + colorOption);
+}
+
+function editClass(classID) {
+
+}
+
 // redraw the page when the window size changes
 $(window).on('resize', function () {
     draw();
@@ -130,6 +185,7 @@ $(window).on('resize', function () {
 
 $('#addClassButton').on('click', function () {
     $('#addClassModal').modal('show');
+    setPreviewBoxColor('addClass');
 });
 
 $('#addClassForm').on('submit', function (event) {
@@ -145,12 +201,19 @@ $('#addClassForm').on('submit', function (event) {
     classInfo.days[2] = $('#addClassDayWednesday').is(':checked');
     classInfo.days[3] = $('#addClassDayThursday').is(':checked');
     classInfo.days[4] = $('#addClassDayFriday').is(':checked');
+    classInfo.color = $('#addClassColor').val();
 
     var classID = $('#addClassClassID').val();
     classes[classID] = classInfo;
     saveClassInfo();
 
     $('#addClassModal').modal('hide');
+    calculateInterval();
+    draw();
+});
+
+$('#addClassColor').on('change', function () {
+    setPreviewBoxColor('addClass');
 });
 
 // starting info for creating the app

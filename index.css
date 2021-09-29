@@ -79,3 +79,34 @@ html, body {
     position: relative;
     top: -8px;
 }
+
+/* Classbox and it's colors */
+.class-box {
+    position: relative;
+    box-sizing: border-box;
+    border-radius: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.custombg-blue {
+    background-color: #2636c7 !important;
+}
+.custombg-blue:hover {
+    background-color: #1b2585 !important;
+}
+
+.custombg-green {
+    background-color: #1a8a23 !important;
+}
+.custombg-green:hover {
+    background-color: #105216 !important;
+}
+
+.custombg-red {
+    
+    background-color: #cf3f30 !important;
+}
+.custombg-red:hover {
+    background-color: #85291e !important;
+}
