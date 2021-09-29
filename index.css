@@ -97,6 +97,10 @@ html, body {
     padding-top: 10px;
     padding-bottom: 10px;
 }
+.class-box.very-small {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
 
 .custombg-blue {
     background-color: #2636c7 !important;
@@ -128,6 +132,9 @@ html, body {
 .class-box.small .class-box-title {
     font-size: 14px;
 }
+.class-box.very-small .class-box-title {
+    font-size: 10px;
+}
 .class-box .class-box-subtitle {
     font-size: 12px;
     margin-top: -5px;
@@ -136,4 +143,8 @@ html, body {
 .class-box.small .class-box-subtitle {
     font-size: 10px;
     margin-top: -2px;
+}
+.class-box.very-small .class-box-subtitle {
+    font-size: 8px;
+    margin-top: -3px;
 }

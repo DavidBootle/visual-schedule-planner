@@ -84,7 +84,10 @@ function draw() {
         classBox.addClass('custombg-' + classInfo.color);
         classBox.css('z-index', Math.round(99 - classBoxHeight / 10));
 
-        if (classBoxHeight <= 90) {
+        if (classBoxHeight <= 65) {
+            classBox.addClass('very-small');
+        }
+        else if (classBoxHeight <= 90) {
             classBox.addClass('small');
         }
 
