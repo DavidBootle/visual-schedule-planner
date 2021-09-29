@@ -88,6 +88,9 @@ html, body {
     margin-left: 5px;
     margin-right: 5px;
 }
+.class-box:hover {
+    z-index: 99;
+}
 
 .custombg-blue {
     background-color: #2636c7 !important;

@@ -87,7 +87,13 @@ function draw() {
         // draw classBox
         for (var i = 0; i < numOfDays; i++) {
             if (classInfo.days[i]) {
-                $(`.dayrow .content`).eq(i).append(classBox.clone());
+                var clone = classBox.clone();
+                // register classBox onclick
+                clone = clone.on('click', function() {
+                    editClass(classID);
+                });
+
+                $(`.dayrow .content`).eq(i).append(clone);
             }
         }
     }
@@ -143,6 +149,11 @@ function updateTimeIntervals(start, end) {
 function parseTimeStringToDecimal(timeString) {
     const parsingRegex = /^(?<hours>\d{1,2}):(?<minutes>\d{2})[ ]*(?<ending>(AM|PM))$/i;
     var match = parsingRegex.exec(timeString);
+
+    if (match == null) {
+        return null;
+    }
+
     var hours = match.groups.hours;
     var minutes = match.groups.minutes;
     var ending = match.groups.ending;
@@ -153,6 +164,25 @@ function parseTimeStringToDecimal(timeString) {
         time += 12;
     }
     return time;
+}
+
+function parseDecimalTimeToString(time) {
+    var hours = Math.floor(time);
+    var minutes = Math.round((time - hours) * 60);
+
+    pm = false;
+    if (hours > 12) {
+        hours -= 12;
+        pm = true;
+    }
+
+    var hoursString = hours.toString();
+    var minutesString = minutes.toString();
+    while (minutesString.length < 2) {
+        minutesString = '0' + minutesString;
+    }
+
+    return `${hoursString}:${minutesString} ${(pm ? 'PM' : 'AM' )}`;
 }
 
 function loadClassInfo() {
@@ -175,7 +205,106 @@ function setPreviewBoxColor(prefix) {
 }
 
 function editClass(classID) {
+    const classInfo = classes[classID];
 
+    // update title
+    $('#editClassModalTitle').text('Editing ' + classInfo.displayName);
+
+    // update form values
+    $('#editClassDisplayName').val(classInfo.displayName);
+    $('#editClassClassID').val(classID);
+    $('#editClassOldClassID').val(classID);
+    $('#editClassStartTime').val( parseDecimalTimeToString(classInfo.startTime) );
+    $('#editClassEndTime').val( parseDecimalTimeToString(classInfo.endTime) );
+    $('#editClassColor').val( classInfo.color );
+    setPreviewBoxColor('editClass');
+
+    // update weekday checks
+    $('#editClassDayMonday').prop('checked', classInfo.days[0]);
+    $('#editClassDayTuesday').prop('checked', classInfo.days[1]);
+    $('#editClassDayWednesday').prop('checked', classInfo.days[2]);
+    $('#editClassDayThursday').prop('checked', classInfo.days[3]);
+    $('#editClassDayFriday').prop('checked', classInfo.days[4]);
+
+    // show modal
+    $('#editClassModal').modal('show');
+}
+
+function parseClassInfo(prefix, editingMode) {
+    var invalid = false;
+    var classInfo = {};
+
+    // validation
+    var displayName = $(`#${prefix}DisplayName`).val();
+    if (displayName.length == 0) {
+        invalid = true;
+        $(`#${prefix}DisplayName`).addClass('is-invalid');
+    } else {
+        $(`#${prefix}DisplayName`).removeClass('is-invalid');
+    }
+
+    var classID = $(`#${prefix}ClassID`).val();
+    if (classes[classID] != null) {
+        // disable duplication check when in editing mode (as the user can leave the id the same)
+        if (!editingMode) {
+            invalid = true;
+            $(`#${prefix}ClassID`).addClass('is-invalid');
+            $(`#${prefix}ClassIDFeedback`).text('This ID is already taken.');
+        }
+    }
+    else if (classID.length == 0) {
+        invalid = true;
+        $(`#${prefix}ClassID`).addClass('is-invalid');
+        $(`#${prefix}ClassIDFeedback`).text('Cannot be empty.');
+    } else {
+        $(`#${prefix}ClassID`).removeClass('is-invalid');
+    }
+
+    var startTime = parseTimeStringToDecimal($(`#${prefix}StartTime`).val());
+    if (startTime == null) {
+        invalid = true;
+        $(`#${prefix}StartTime`).addClass('is-invalid');
+    } else {
+        $(`#${prefix}StartTime`).removeClass('is-invalid');
+    }
+
+    var endTime = parseTimeStringToDecimal($(`#${prefix}EndTime`).val());
+    if (startTime == null) {
+        invalid = true;
+        $(`#${prefix}EndTime`).addClass('is-invalid');
+    } else {
+        $(`#${prefix}EndTime`).removeClass('is-invalid');
+    }
+
+    var days = [false, false, false, false, false];
+    days[0] = $(`#${prefix}DayMonday`).is(':checked');
+    days[1] = $(`#${prefix}DayTuesday`).is(':checked');
+    days[2] = $(`#${prefix}DayWednesday`).is(':checked');
+    days[3] = $(`#${prefix}DayThursday`).is(':checked');
+    days[4] = $(`#${prefix}DayFriday`).is(':checked');
+
+    var isAllFalse = days.every((value) => {
+        return value == false;
+    });
+    if (isAllFalse) {
+        invalid = true;
+        $(`#${prefix}DayFeedback`).show();
+    } else {
+        $(`#${prefix}DayFeedback`).hide();
+    }
+
+    // put properties into one object
+    classInfo.displayName = displayName;
+    classInfo.startTime = startTime;
+    classInfo.endTime = endTime;
+    classInfo.days = days;
+    classInfo.color = $(`#${prefix}Color`).val();
+
+    return {
+        classID: classID,
+        classInfo: classInfo,
+        invalid: invalid
+    }
 }
 
 // redraw the page when the window size changes
@@ -191,29 +320,43 @@ $('#addClassButton').on('click', function () {
 $('#addClassForm').on('submit', function (event) {
     event.preventDefault();
 
-    var classInfo = {};
-    classInfo.displayName = $('#addClassDisplayName').val();
-    classInfo.startTime = parseTimeStringToDecimal($('#addClassStartTime').val());
-    classInfo.endTime = parseTimeStringToDecimal($('#addClassEndTime').val());
-    classInfo.days = [false, false, false, false, false];
-    classInfo.days[0] = $('#addClassDayMonday').is(':checked');
-    classInfo.days[1] = $('#addClassDayTuesday').is(':checked');
-    classInfo.days[2] = $('#addClassDayWednesday').is(':checked');
-    classInfo.days[3] = $('#addClassDayThursday').is(':checked');
-    classInfo.days[4] = $('#addClassDayFriday').is(':checked');
-    classInfo.color = $('#addClassColor').val();
+    var {classID, classInfo, invalid} = parseClassInfo('addClass', false);
+    
+    if (!invalid) {
+        classes[classID] = classInfo;
+        saveClassInfo();
 
-    var classID = $('#addClassClassID').val();
-    classes[classID] = classInfo;
-    saveClassInfo();
-
-    $('#addClassModal').modal('hide');
-    calculateInterval();
-    draw();
+        $('#addClassModal').modal('hide');
+        calculateInterval();
+        draw();
+    }
 });
+
+$('#editClassForm').on('submit', function (event) {
+    event.preventDefault();
+
+    var {classID, classInfo, invalid} = parseClassInfo('editClass', true);
+    var oldClassID = $('#editClassOldClassID').val();
+
+    if (!invalid) {
+        if (classID != oldClassID) {
+            delete classes[oldClassID];
+        }
+        classes[classID] = classInfo;
+        saveClassInfo();
+    
+        $('#editClassModal').modal('hide');
+        calculateInterval();
+        draw();
+    }
+})
 
 $('#addClassColor').on('change', function () {
     setPreviewBoxColor('addClass');
+});
+
+$('#editClassColor').on('change', function () {
+    setPreviewBoxColor('editClass');
 });
 
 // starting info for creating the app

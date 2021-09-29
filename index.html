@@ -51,21 +51,25 @@
                 </div>
                 <div class="modal-body">
                     <form id="addClassForm">
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-3 has-validation">
                             <input id="addClassDisplayName" type="text" class="form-control" placeholder="English 101" name="displayName"/>
                             <label for="addClassDisplayName" class="form-label">Display Name</label>
+                            <div class="invalid-feedback">Cannot be empty.</div>
                         </div>
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-3 has-validation">
                             <input id="addClassClassID" type="text" class="form-control" placeholder="ENG-101-001"/>
                             <label for="addClassClassID" class="form-label">Class ID</label>
+                            <div class="invalid-feedback" id="addClassClassIDFeedback">Cannot be empty.</div>
                         </div>
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-3 has-validation">
                             <input id="addClassStartTime" type="text" class="form-control" placeholder="8:00 AM"/>
                             <label for="addClassStartTime" class="form-label">Start Time</label>
+                            <div class="invalid-feedback">Must be a valid time in the form HH:MM AM/PM. For example, 10:30 AM.</div>
                         </div>
                         <div class="form-floating mb-3">
                             <input id="addClassEndTime" type="text" class="form-control" placeholder="9:30 AM"/>
                             <label for="addClassEndTime" class="form-label">End Time</label>
+                            <div class="invalid-feedback">Must be a valid time in the form HH:MM AM/PM. For example, 10:30 AM.</div>
                         </div>
                         <div class="mb-3">
                             <div class="form-check form-check-inline">
@@ -88,6 +92,9 @@
                                 <input class="form-check-input" type="checkbox" id="addClassDayFriday" value="friday">
                                 <label class="form-check-label" for="addClassDayFriday">FRI</label>
                             </div>
+                            <div id="addClassDayFeedback" style="display: none">
+                                <span style="color:red">Must select at least one day.</span>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="addClassColor" class="form-label">Color</label>
@@ -101,6 +108,77 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Add</button>
+                    </form>
+                </div>
+            </div></div>
+        </div>
+
+        <div id="editClassModal" class="modal" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editClassModalTitle">Editing [ClassName]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editClassForm">
+                        <input id="editClassOldClassID" type="hidden"/>
+                        <div class="form-floating mb-3 has-validation">
+                            <input id="editClassDisplayName" type="text" class="form-control" placeholder="English 101" name="displayName"/>
+                            <label for="editClassDisplayName" class="form-label">Display Name</label>
+                            <div class="invalid-feedback">Cannot be empty.</div>
+                        </div>
+                        <div class="form-floating mb-3 has-validation">
+                            <input id="editClassClassID" type="text" class="form-control" placeholder="ENG-101-001"/>
+                            <label for="editClassClassID" class="form-label">Class ID</label>
+                            <div class="invalid-feedback" id="editClassClassIDFeedback">Cannot be empty.</div>
+                        </div>
+                        <div class="form-floating mb-3 has-validation">
+                            <input id="editClassStartTime" type="text" class="form-control" placeholder="8:00 AM"/>
+                            <label for="editClassStartTime" class="form-label">Start Time</label>
+                            <div class="invalid-feedback">Must be a valid time in the form HH:MM AM/PM. For example, 10:30 AM.</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input id="editClassEndTime" type="text" class="form-control" placeholder="9:30 AM"/>
+                            <label for="editClassEndTime" class="form-label">End Time</label>
+                            <div class="invalid-feedback">Must be a valid time in the form HH:MM AM/PM. For example, 10:30 AM.</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="editClassDayMonday" value="monday">
+                                <label class="form-check-label" for="editClassDayMonday">MON</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="editClassDayTuesday" value="tuesday">
+                                <label class="form-check-label" for="editClassDayTuesday">TUE</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="editClassDayWednesday" value="wednesday">
+                                <label class="form-check-label" for="editClassDayWednesday">WED</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="editClassDayThursday" value="thursday">
+                                <label class="form-check-label" for="editClassDayThursday">THU</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="editClassDayFriday" value="friday">
+                                <label class="form-check-label" for="editClassDayFriday">FRI</label>
+                            </div>
+                            <div id="editClassDayFeedback" style="display: none">
+                                <span style="color:red">Must select at least one day.</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editClassColor" class="form-label">Color</label>
+                            <div class="input-group">
+                                <span class="input-group-text color-preview-box">&nbsp;&nbsp;</span>
+                                <select class="form-control" id="editClassColor">
+                                    <option value="blue" selected>Blue</option>
+                                    <option value="green">Green</option>
+                                    <option value="red">Red</option> 
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
                     </form>
                 </div>
             </div></div>
