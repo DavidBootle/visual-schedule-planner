@@ -427,6 +427,33 @@ $('#saveAsPNGButton').on('click', function() {
     });
 });
 
+$('#saveScheduleButton').on('click', function() {
+    $('#saveScheduleModal').modal('show');
+
+    // get json repesentation of schedule
+    const jsonClasses = JSON.stringify(classes);
+
+    // set link stuff
+    $('#saveScheduleDownloadLink').attr('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonClasses));
+    $('#saveScheduleDownloadLink').attr('download', 'schedule.json');
+    $('#saveScheduleDownloadLink').removeClass('disabled');
+});
+
+$('#saveScheduleFilename').on('input', function (event) {
+    console.log('input');
+
+    var filename = $('#saveScheduleFilename').val();
+    if (filename == '') {
+        filename = 'schedule';
+    }
+
+    $('#saveScheduleDownloadLink').attr('download', `${filename}.json`);
+});
+
+$('#saveScheduleDownloadLink').on('click', function() {
+    $('#saveScheduleModal').modal('hide');
+});
+
 // starting info for creating the app
 loadClassInfo();
 calculateInterval();

@@ -44,6 +44,7 @@
         <div id="controlscontainer">
             <button class="btn btn-primary" id="addClassButton">Add Class</button>
             <button class="btn btn-secondary" id="saveAsPNGButton">Save as PNG</button>
+            <button class="btn btn-secondary" id="saveScheduleButton">Save Schedule</button>
         </div>
 
         <div id="addClassModal" class="modal" tabindex="-1">
@@ -185,6 +186,23 @@
                         <button class="btn btn-danger" id="editClassRemoveButton">Remove</button>
                     </form>
                 </div>
+            </div></div>
+        </div>
+
+        <div id="saveScheduleModal" class="modal" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Save Schedule</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body mb-4">
+                    <p class="lead">This will save a file to your computer. You can upload the file to this website at any point in the future to continue editing the saved schedule.</p>
+                    <div>
+                        <label for="saveScheduleFilename" class="form-label">Schedule Name</label>
+                        <input id="saveScheduleFilename" type="text" class="form-control" placeholder="schedule" name="filename"/>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-primary disabled" id="saveScheduleDownloadLink">Save</a>
             </div></div>
         </div>
 
