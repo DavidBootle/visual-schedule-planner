@@ -454,6 +454,18 @@ $('#saveScheduleDownloadLink').on('click', function() {
     $('#saveScheduleModal').modal('hide');
 });
 
+$('#resetButton').on('click', function () {
+
+    var confirmResponse = confirm('Are you sure? This will clear the current schedule.');
+
+    if (!confirmResponse) { return; }
+
+    classes = {};
+    saveClassInfo();
+    calculateInterval();
+    draw();
+});
+
 // starting info for creating the app
 loadClassInfo();
 calculateInterval();
