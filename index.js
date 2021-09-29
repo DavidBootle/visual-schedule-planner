@@ -136,6 +136,12 @@ function draw() {
 
 // determine the start and end integer cutoffs
 function calculateInterval() {
+    // reset start and end time
+    startTime = null;
+    endTime = null;
+    startInt = null;
+    endInt = null;
+
     // calculate start and end time
     if (Object.keys(classes).length == 0) {
         startTime = 8;
@@ -195,7 +201,7 @@ function parseTimeStringToDecimal(timeString) {
 
     var time = parseInt(hours);
     time += (parseInt(minutes) / 60);
-    if (ending.toLowerCase() == 'pm') {
+    if (ending.toLowerCase() == 'pm' && hours < 12) {
         time += 12;
     }
     return time;
@@ -391,6 +397,22 @@ $('#addClassColor').on('change', function () {
 
 $('#editClassColor').on('change', function () {
     setPreviewBoxColor('editClass');
+});
+
+$('#editClassRemoveButton').on('click', function(event) {
+    event.preventDefault();
+
+    var classID = $('#editClassOldClassID').val();
+
+    var confirmResponse = confirm('Are you sure you want to delete this class?');
+    if (!confirmResponse) { return; }
+
+    delete classes[classID];
+
+    $('#editClassModal').modal('hide');
+    saveClassInfo();
+    calculateInterval();
+    draw();
 });
 
 // starting info for creating the app
