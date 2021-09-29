@@ -80,9 +80,9 @@ function draw() {
         var classBox = $('<div></div>');
         classBox = classBox.data('class-id', classID);
         classBox = classBox.addClass('class-box');
-        classBox = classBox.css('top', -1 * bottomOffset);
         classBox = classBox.css('height', classBoxHeight);
         classBox = classBox.addClass('custombg-' + classInfo.color);
+        classBox = classBox.css('z-index', Math.round(99 - classBoxHeight / 100));
 
         // draw classBox
         for (var i = 0; i < numOfDays; i++) {
@@ -94,6 +94,17 @@ function draw() {
                 });
 
                 $(`.dayrow .content`).eq(i).append(clone);
+
+                // get total heights of all classBoxes on top of it (in the dom), and add their height to the offset
+                var prevSiblings = clone.prevAll('.class-box');
+                console.log(prevSiblings);
+                var totalHeight = 0;
+                for (var k = 0; k < prevSiblings.length; k++) {
+                    var sibling = prevSiblings.eq(k);
+                    totalHeight += sibling.outerHeight();
+                }
+
+                clone.css('top', -1 * bottomOffset - totalHeight);
             }
         }
     }

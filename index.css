@@ -89,7 +89,7 @@ html, body {
     margin-right: 5px;
 }
 .class-box:hover {
-    z-index: 99;
+    z-index: 100;
 }
 
 .custombg-blue {
