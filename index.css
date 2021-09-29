@@ -28,6 +28,11 @@ html, body {
     padding-top: 20px;
 }
 
+#controlscontainer button {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
 #viewcontainer {
     height: 80vh;
     width: 90vw;

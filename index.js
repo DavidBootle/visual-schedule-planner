@@ -415,6 +415,18 @@ $('#editClassRemoveButton').on('click', function(event) {
     draw();
 });
 
+$('#saveAsPNGButton').on('click', function() {
+    $('#titlecontainer').children().hide();
+    $('#controlscontainer').hide();
+    html2canvas($('body')[0]).then((canvas) => {
+        canvas.toBlob(function (blob) {
+            saveAs(blob, "schedule.png");
+            $('#titlecontainer').children().show();
+            $('#controlscontainer').show();
+        });
+    });
+});
+
 // starting info for creating the app
 loadClassInfo();
 calculateInterval();
