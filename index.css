@@ -20,6 +20,15 @@ html, body {
     font-weight: bold;
 }
 
+#titlecontainer .title a {
+    color: black;
+    text-decoration: none;
+}
+#titlecontainer .title a:hover {
+    color: #001d5c;
+    text-decoration: underline;
+}
+
 #controlscontainer {
     width: 100vw;
     display: flex;
