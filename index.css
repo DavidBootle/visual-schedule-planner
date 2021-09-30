@@ -131,6 +131,14 @@ html, body {
     background-color: #85291e !important;
 }
 
+.custombg-purple {
+    background-color: #a42bbd !important;
+    color: white;
+}
+.custombg-purple:hover {
+    background-color: #7e1f91 !important;
+}
+
 .class-box .class-box-title {
     font-size: 20px;
 }
