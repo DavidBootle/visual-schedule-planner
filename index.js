@@ -347,6 +347,69 @@ function parseClassInfo(prefix, editingMode) {
     }
 }
 
+function verifyScheduleFile(fileContents) {
+    var contents; // the object version of fileContents
+
+    // verify the contents can be parsed by json
+    try {
+        contents = JSON.parse(fileContents);
+    } catch (error) {
+        console.log('schedule file verification failed due to invalid json')
+        return { success: false, contents: null };
+    }
+
+    // if the object has no keys, accept it automatically
+    if (Object.keys(contents).length == 0) {
+        return { success: true, contents: contents };
+    }
+
+    // go through each key and verify that all the necessary properties exist and are of the correct type
+    for (const classID in contents) {
+        const classInfo = contents[classID];
+
+        // verify display name
+        if (classInfo.displayName == null || typeof(classInfo.displayName) != 'string') {
+            console.log('display name verification failed');
+            return { success: false, contents: null };
+        }
+
+        // verify start time
+        if (classInfo.startTime == null || typeof(classInfo.startTime) != 'number') {
+            console.log('start time verification failed');
+            return { success: false, contents: null };
+        }
+
+        // verify end time
+        if (classInfo.endTime == null || typeof(classInfo.endTime) != 'number') {
+            console.log('end time verification failed');
+            return { success: false, contents: null };
+        }
+
+        // verify days
+        if (classInfo.days == null || !Array.isArray(classInfo.days) || classInfo.days.length != 5) {
+            console.log('days verification failed');
+            return { success: false, contents: null };
+        }
+
+        // verify days contents
+        for (const value of classInfo.days) {
+            if (typeof(value) != 'boolean') {
+                console.log('days value verification failed');
+                return { success: false, contents: null };
+            }
+        }
+
+        // verify colors
+        if (classInfo.color == null || typeof(classInfo.color) != 'string') {
+            console.log('color verification failed');
+            return { success: false, contents: null };
+        }
+    }
+
+    // verification passed!
+    return { success: true, contents: contents };
+}
+
 // redraw the page when the window size changes
 $(window).on('resize', function () {
     draw();
@@ -447,11 +510,65 @@ $('#saveScheduleFilename').on('input', function (event) {
         filename = 'schedule';
     }
 
-    $('#saveScheduleDownloadLink').attr('download', `${filename}.json`);
+    $('#saveScheduleDownloadLink').attr('download', `${filename}.schedule`);
 });
 
 $('#saveScheduleDownloadLink').on('click', function() {
     $('#saveScheduleModal').modal('hide');
+});
+
+$('#loadScheduleButton').on('click', function () {
+    // reset modal before showing modal
+    $('#loadScheduleFileInput').val('');
+    $('#loadScheduleLoadButton').addClass('disabled');
+    $('#loadScheduleFileInputFeedback').hide();
+    $('#loadScheduleModal').modal('show');
+});
+
+$('#loadScheduleFileInput').on('change', function () {
+    var inputValue = $('#loadScheduleFileInput').val();
+    if (inputValue != "") {
+        $('#loadScheduleLoadButton').removeClass('disabled');
+    }
+});
+
+$('#loadScheduleLoadButton').on('click', function () {
+
+    // verify that the button is not disabled
+    var disabled = $('#loadScheduleLoadButton').prop('disabled');
+    if (disabled) { return; }
+
+    // attempt to load and read file
+    var inputFile = $('#loadScheduleFileInput').prop('files')[0];
+    if (inputFile != null) {
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+            // if file was successfully read
+            const fileContents = evt.target.result;
+            var {success, contents } = verifyScheduleFile(fileContents);
+            if (!success) {
+                $('#loadScheduleFileInputFeedback').show();
+                $('#loadScheduleFileInputFeedback span').text('Invalid schedule file.');
+            } else {
+                var confirmResponse = confirm('This will clear your current schedule? Are you sure you want to continue?');
+                if (!confirmResponse) { return; }
+
+                classes = contents;
+                saveClassInfo();
+                calculateInterval();
+                draw();
+                $('#loadScheduleModal').modal('hide');
+            }
+        }
+        reader.onerror = function (evt) {
+            $('#loadScheduleFileInputFeedback').show();
+            $('#loadScheduleFileInputFeedback span').text('An error occurred while reading the file.');
+        }
+        reader.readAsText(inputFile);
+    } else {
+        $('#loadScheduleFileInputFeedback').show();
+        $('#loadScheduleFileInputFeedback span').text('No file input detected.');
+    }
 });
 
 $('#resetButton').on('click', function () {

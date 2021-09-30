@@ -45,6 +45,7 @@
             <button class="btn btn-primary" id="addClassButton">Add Class</button>
             <button class="btn btn-secondary" id="saveAsPNGButton">Save as PNG</button>
             <button class="btn btn-secondary" id="saveScheduleButton">Save Schedule</button>
+            <button class="btn btn-secondary" id="loadScheduleButton">Load Schedule</button>
             <button class="btn btn-danger" id="resetButton">Reset</button>
         </div>
 
@@ -198,12 +199,34 @@
                 </div>
                 <div class="modal-body mb-4">
                     <p class="lead">This will save a file to your computer. You can upload the file to this website at any point in the future to continue editing the saved schedule.</p>
-                    <div>
+                    <div class="mb-4">
                         <label for="saveScheduleFilename" class="form-label">Schedule Name</label>
                         <input id="saveScheduleFilename" type="text" class="form-control" placeholder="schedule" name="filename"/>
                     </div>
+                    <a href="#" class="btn btn-primary disabled" id="saveScheduleDownloadLink">Save</a>
                 </div>
-                <a href="#" class="btn btn-primary disabled" id="saveScheduleDownloadLink">Save</a>
+            </div></div>
+        </div>
+
+        <div id="loadScheduleModal" class="modal" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Save Schedule</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                      </form>
+                    <p class="lead">Load a previously saved schedule file. This will clear your current schedule.</p>
+                    <div class="form-group mb-3">
+                        <label for="exampleFormControlFile1">Schedule File</label><br>
+                        <input type="file" class="form-control-file" id="loadScheduleFileInput" accept=".schedule">
+                        <div id="loadScheduleFileInputFeedback" style="display: none">
+                            <span style="color:red">An error occurred and the file could not be loaded.</span>
+                        </div>
+                      </div>
+                    <button class="btn btn-primary disabled" id="loadScheduleLoadButton">Load</button>
+                </div>
             </div></div>
         </div>
 
