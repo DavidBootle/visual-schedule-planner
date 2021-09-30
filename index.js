@@ -550,7 +550,7 @@ $('#loadScheduleLoadButton').on('click', function () {
                 $('#loadScheduleFileInputFeedback').show();
                 $('#loadScheduleFileInputFeedback span').text('Invalid schedule file.');
             } else {
-                var confirmResponse = confirm('This will clear your current schedule? Are you sure you want to continue?');
+                var confirmResponse = confirm('This will clear your current schedule. Are you sure you want to continue?');
                 if (!confirmResponse) { return; }
 
                 classes = contents;
