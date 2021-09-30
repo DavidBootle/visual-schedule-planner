@@ -416,6 +416,23 @@ $(window).on('resize', function () {
 });
 
 $('#addClassButton').on('click', function () {
+    // reset form values
+    $('#addClassDisplayName').val('');
+    $('#addClassDisplayName').removeClass('is-invalid');
+    $('#addClassClassID').val('');
+    $('#addClassClassID').removeClass('is-invalid');
+    $('#addClassStartTime').val('');
+    $('#addClassStartTime').removeClass('is-invalid');
+    $('#addClassEndTime').val('');
+    $('#addClassEndTime').removeClass('is-invalid');
+    $('#addClassDayMonday').prop('checked', false);
+    $('#addClassDayTuesday').prop('checked', false);
+    $('#addClassDayWednesday').prop('checked', false);
+    $('#addClassDayThursday').prop('checked', false);
+    $('#addClassDayFriday').prop('checked', false);
+    $('#addClassDayFeedback').hide();
+    $('#addClassColor').val('blue');
+
     $('#addClassModal').modal('show');
     setPreviewBoxColor('addClass');
 });
