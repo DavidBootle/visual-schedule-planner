@@ -7,7 +7,7 @@ html, body {
     display: block;
 }
 
-#titlecontainer {
+#titlecontainer, #scheduleNameContainer {
     height: 65px;
     width: 100vw;
     display: flex;
@@ -15,9 +15,13 @@ html, body {
     flex-direction: column;
 }
 
-#titlecontainer .title {
+#titlecontainer .title, #scheduleNameContainer .schedule-name {
     font-size: 30px;
     font-weight: bold;
+}
+
+#scheduleNameContainer .schedule-name {
+    margin-top: 20px;
 }
 
 #titlecontainer .title a {

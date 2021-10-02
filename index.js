@@ -679,13 +679,15 @@ $('#editClassRemoveButton').on('click', function(event) {
 });
 
 $('#saveAsPNGButton').on('click', function() {
-    
-    $('#titlecontainer').children().hide();
+    $('#titlecontainer').hide();
+    $('#scheduleNameContainer').children('.schedule-name').text(currentSchedule);
+    $('#scheduleNameContainer').show();
     $('#controlscontainer').hide();
     html2canvas($('body')[0]).then((canvas) => {
         canvas.toBlob(function (blob) {
             saveAs(blob, currentSchedule + '.png');
-            $('#titlecontainer').children().show();
+            $('#scheduleNameContainer').hide();
+            $('#titlecontainer').show();
             $('#controlscontainer').show();
         });
     });
