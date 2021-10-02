@@ -9,6 +9,10 @@ var startInt;
 var endInt;
 
 var classes = {};
+var schedules = {};
+var currentSchedule = '';
+
+const defaultScheduleName = 'Untitled Schedule';
 
 // this function should be run to redraw the page
 function draw() {
@@ -176,6 +180,9 @@ function timeLabelFromInt(timeInt) {
         timeInt -= 12;
         pm = true;
     }
+    if (timeInt == 12) {
+        pm = true;
+    }
     var timeString = `${timeInt}:00 ` + (pm ? 'PM' : 'AM');
     return timeString;
 }
@@ -217,6 +224,10 @@ function parseDecimalTimeToString(time, useSpaces = true) {
         pm = true;
     }
 
+    if (hours == 12) {
+        pm = true;
+    }
+
     var hoursString = hours.toString();
     var minutesString = minutes.toString();
     while (minutesString.length < 2) {
@@ -226,17 +237,29 @@ function parseDecimalTimeToString(time, useSpaces = true) {
 }
 
 function loadClassInfo() {
-    var jsonClassInfo = window.localStorage.getItem('classes');
-    if (jsonClassInfo == null) {
-        classes = {};
+    var jsonSchedulesInfo = window.localStorage.getItem('schedules');
+    currentSchedule = window.localStorage.getItem('currentSchedule');
+
+    if (jsonSchedulesInfo == null) {
+        schedules = {};
+        schedules[defaultScheduleName] = {};
     } else {
-        classes = JSON.parse(jsonClassInfo);
+        schedules = JSON.parse(jsonSchedulesInfo);
     }
+
+    if (currentSchedule == null) {
+        currentSchedule = defaultScheduleName;
+    }
+
+    // set classes
+    classes = schedules[currentSchedule];
 }
 
 function saveClassInfo() {
-    var jsonClassInfo = JSON.stringify(classes);
-    window.localStorage.setItem('classes', jsonClassInfo);
+    schedules[currentSchedule] = classes;
+    var jsonSchedulesInfo = JSON.stringify(schedules);
+    window.localStorage.setItem('schedules', jsonSchedulesInfo);
+    window.localStorage.setItem('currentSchedule', currentSchedule);
 }
 
 function setPreviewBoxColor(prefix) {
@@ -348,19 +371,34 @@ function parseClassInfo(prefix, editingMode) {
 }
 
 function verifyScheduleFile(fileContents) {
-    var contents; // the object version of fileContents
+    var scheduleFileObject;
+    var contents;
 
     // verify the contents can be parsed by json
     try {
-        contents = JSON.parse(fileContents);
+        scheduleFileObject = JSON.parse(fileContents);
     } catch (error) {
         console.log('schedule file verification failed due to invalid json')
         return { success: false, contents: null };
     }
 
+    // check for the schedule file name
+    if (scheduleFileObject.name == null) {
+        console.log('Schedule file did not contain schedule name');
+        return { success: false, contents: null };
+    }
+
+    // check for schedule file classes property
+    if (scheduleFileObject.classes == null) {
+        console.log('Schedule file did not contain classes property');
+        return { success: false, contents: null };
+    } else {
+        contents = scheduleFileObject.classes;
+    }
+
     // if the object has no keys, accept it automatically
     if (Object.keys(contents).length == 0) {
-        return { success: true, contents: contents };
+        return { success: true, contents: scheduleFileObject };
     }
 
     // go through each key and verify that all the necessary properties exist and are of the correct type
@@ -407,7 +445,147 @@ function verifyScheduleFile(fileContents) {
     }
 
     // verification passed!
-    return { success: true, contents: contents };
+    return { success: true, contents: scheduleFileObject };
+}
+
+function parseNewScheduleName(newName) {
+    // make sure the name isn't a duplicate
+    while (schedules[newName] != null) {
+
+        var match = newName.match(/^(?<characters>.*?)(?<digits>\d+)$/);
+
+        // if newName ends in digits, increment the ending digits
+        if (match != null) {
+            var digits = parseInt(match.groups.digits);
+            digits++;
+            newName = match.groups.characters + digits.toString();
+        } else {
+            newName = newName + '1';
+        }
+    }
+    return newName;
+}
+
+function buildSchedulesModal () {
+    // build schedules modal
+    $('#viewSchedulesSchedulesList').empty(scheduleRow);
+
+    for (const scheduleName in schedules) {
+
+        // generate element
+        const schedule = schedules[scheduleName];
+        if (schedule == undefined) { continue; }
+        var scheduleRow = $('#viewSchedulesScheduleRowTemplate').clone();
+        scheduleRow.show();
+        scheduleRow.prop('id', '');
+        scheduleRow.children('.schedule-row').children('.schedule-name').text(scheduleName);
+        scheduleRow.children('.schedule-row').children('.schedule-name').data('name', scheduleName);
+        if (scheduleName == currentSchedule) {
+            scheduleRow.addClass('active');
+        }
+
+        // add to dom
+        $('#viewSchedulesSchedulesList').append(scheduleRow);
+
+        // ADD HANDLERS
+        // schedule name
+        scheduleRow.children('.schedule-row').children('.schedule-name').on('blur', function (event) {
+            var newName = $(this).text();
+            var oldName = $(this).data('name');
+
+            if (newName == oldName) { return; } else {
+                newName = parseNewScheduleName(newName);
+                // change schedule name
+                schedules[newName] = schedules[oldName];
+                $(this).data('name', newName);
+                $(this).text(newName);
+                schedules[oldName] = undefined;
+                if (currentSchedule == oldName) { // if the changed schedule was the active schedule
+                    setCurrentSchedule(newName);
+                } else { // if the changed schedule was not the active schedule
+                    buildSchedulesModal();
+                }
+                console.log(schedules);
+                console.log(currentSchedule);
+            }
+        });
+        scheduleRow.children('.schedule-row').children('.schedule-name').on('mouseover', function () {
+            scheduleRow.children('.schedule-row').children('.schedule-name').prop('contenteditable', true);
+            scheduleRow.data('clicks-disabled', true)
+        });
+        scheduleRow.children('.schedule-row').children('.schedule-name').on('mouseout', function () {
+            scheduleRow.children('.schedule-row').children('.schedule-name').prop('contenteditable', false);
+            scheduleRow.data('clicks-disabled', false)
+        });
+
+        // download button
+        scheduleRow.children('.schedule-row').children('.schedule-icon-download').on('click', function () {
+
+            // get json repesentation of schedule
+            var exportedScheduleObject = {
+                name: scheduleName,
+                classes: schedules[scheduleName]
+            };
+            const jsonClasses = JSON.stringify(exportedScheduleObject);
+
+            var blob = new Blob([jsonClasses], {type: 'application/json;charset=utf-8'});
+            saveAs(blob, `${scheduleName}.schedule`);
+        });
+        scheduleRow.children('.schedule-row').children('.schedule-icon-download').on('mouseover', function () {
+            scheduleRow.data('clicks-disabled', true)
+        });
+        scheduleRow.children('.schedule-row').children('.schedule-icon-download').on('mouseout', function () {
+            scheduleRow.data('clicks-disabled', false)
+        });
+
+        // remove button
+        scheduleRow.children('.schedule-row').children('.schedule-icon-delete').on('click', function () {
+            var confirmResponse = confirm('Are you sure you want to delete this schedule? This cannot be undone.');
+
+            if (!confirmResponse) { return; }
+
+            schedules[scheduleName] = undefined;
+            delete schedules[scheduleName];
+
+            // was this schedule the active schedule
+            if (currentSchedule == scheduleName) {
+                // if the schedule was the last schedule, then add a new default schedule and set it as the current schedule
+                if (Object.keys(schedules).length == 0) {
+                    schedules[defaultScheduleName] = {};
+                    setCurrentSchedule(defaultScheduleName);
+                    return;
+                }
+                
+                // otherwise, set the current schedule to the first schedule in the schedules list
+                setCurrentSchedule(Object.keys(schedules)[0]);
+            } else {
+                buildSchedulesModal();
+                saveClassInfo();
+            }
+        });
+        scheduleRow.children('.schedule-row').children('.schedule-icon-delete').on('mouseover', function () {
+            scheduleRow.data('clicks-disabled', true)
+        });
+        scheduleRow.children('.schedule-row').children('.schedule-icon-delete').on('mouseout', function () {
+            scheduleRow.data('clicks-disabled', false)
+        });
+
+        // clicking the row itself
+        scheduleRow.on('click', function () {
+            if (!(scheduleRow.data('clicks-disabled'))) {
+                setCurrentSchedule(scheduleName);
+            }
+        });
+    }
+}
+
+function setCurrentSchedule(newScheduleName) {
+    currentSchedule = newScheduleName;
+    classes = schedules[currentSchedule];
+    saveClassInfo();
+    buildSchedulesModal();
+    calculateInterval();
+    draw();
 }
 
 // redraw the page when the window size changes
@@ -598,6 +776,77 @@ $('#resetButton').on('click', function () {
     saveClassInfo();
     calculateInterval();
     draw();
+});
+
+$('#viewSchedulesButton').on('click', function () {
+    buildSchedulesModal();
+    $('#viewSchedulesModal').modal('show');
+});
+
+$('#viewSchedulesNewScheduleButton').on('click', function() {
+    var newScheduleName = parseNewScheduleName(defaultScheduleName);
+    schedules[newScheduleName] = {};
+    setCurrentSchedule(newScheduleName);
+});
+
+$('#viewScheduleUploadScheduleButton').on('click', function () {
+    $('#uploadScheduleFileInput').val('');
+    $('#uploadScheduleUploadButton').addClass('disabled');
+    $('#viewSchedulesModal').modal('hide');
+    $('#uploadScheduleModal').modal('show');
+});
+
+$('#uploadScheduleFileInput').on('change', function () {
+    var inputValue = $('#uploadScheduleFileInput').val();
+    if (inputValue != "") {
+        $('#uploadScheduleUploadButton').removeClass('disabled');
+    }
+});
+
+$('#uploadScheduleUploadButton').on('click', function () {
+
+    // verify that the button is not disabled
+    var disabled = $('#uploadScheduleUploadButton').prop('disabled');
+    if (disabled) { return; }
+
+    // attempt to load and read file
+    var inputFile = $('#uploadScheduleFileInput').prop('files')[0];
+    if (inputFile != null) {
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+            // if file was successfully read
+            const fileContents = evt.target.result;
+
+            var {success, contents } = verifyScheduleFile(fileContents);
+            if (!success) {
+                $('#uploadScheduleFileInputFeedback').show();
+                $('#uploadScheduleFileInputFeedback span').text('Invalid schedule file.');
+            } else {
+
+                var scheduleName = parseNewScheduleName(contents.name);
+                var scheduleClasses = contents.classes;
+                schedules[scheduleName] = scheduleClasses;
+                setCurrentSchedule(scheduleName);
+                saveClassInfo();
+                calculateInterval();
+                draw();
+                $('#uploadScheduleModal').modal('hide');
+                $('#viewSchedulesModal').modal('show');
+            }
+        }
+        reader.onerror = function (evt) {
+            $('#uploadScheduleFileInputFeedback').show();
+            $('#uploadScheduleFileInputFeedback span').text('An error occurred while reading the file.');
+        }
+        reader.readAsText(inputFile);
+    } else {
+        $('#uploadScheduleFileInputFeedback').show();
+        $('#uploadScheduleFileInputFeedback span').text('No file input detected.');
+    }
+});
+
+$('#uploadScheduleModal').on('hide.bs.modal', function() {
+    $('#viewSchedulesModal').modal('show');
 });
 
 // starting info for creating the app

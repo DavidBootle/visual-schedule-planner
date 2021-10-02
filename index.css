@@ -94,6 +94,54 @@ html, body {
     top: -8px;
 }
 
+.schedule-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.schedule-row .schedule-name {
+    flex-grow: 10;
+    font-size: 16px;
+}
+
+.schedule-row .schedule-icon svg {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    fill: #000;
+    padding-left: 5px;
+}
+
+.list-group-item.active .schedule-row .schedule-icon.schedule-icon-download svg, .list-group-item.active .schedule-row .schedule-icon.schedule-icon-delete svg {
+    fill: white;
+}
+
+.list-group-item.active .schedule-row .schedule-icon.schedule-icon-download svg:hover, .list-group-item.active .schedule-row .schedule-icon.schedule-icon-delete svg:hover {
+    fill: black;
+}
+
+.schedule-row .schedule-icon.schedule-icon-download:hover svg {
+    fill: #1d5ade;
+}
+.schedule-row .schedule-icon.schedule-icon-delete:hover svg {
+    fill: darkred;
+}
+
+.modal-button-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.modal-button-group-button {
+    width: 30%;
+}
+
 /* Classbox and it's colors */
 .class-box {
     position: relative;
