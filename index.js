@@ -708,18 +708,6 @@ $('#saveAsPNGButton').on('click', function() {
     });
 });
 
-$('#resetButton').on('click', function () {
-
-    var confirmResponse = confirm('Are you sure? This will clear the current schedule.');
-
-    if (!confirmResponse) { return; }
-
-    classes = {};
-    saveClassInfo();
-    calculateInterval();
-    draw();
-});
-
 $('#viewSchedulesButton').on('click', function () {
     buildSchedulesModal();
     $('#viewSchedulesModal').modal('show');
