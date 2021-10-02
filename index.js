@@ -685,87 +685,6 @@ $('#saveAsPNGButton').on('click', function() {
     });
 });
 
-$('#saveScheduleButton').on('click', function() {
-    $('#saveScheduleModal').modal('show');
-
-    // get json repesentation of schedule
-    const jsonClasses = JSON.stringify(classes);
-
-    // set link stuff
-    $('#saveScheduleDownloadLink').attr('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonClasses));
-    $('#saveScheduleDownloadLink').attr('download', 'schedule.json');
-    $('#saveScheduleDownloadLink').removeClass('disabled');
-});
-
-$('#saveScheduleFilename').on('input', function (event) {
-    console.log('input');
-
-    var filename = $('#saveScheduleFilename').val();
-    if (filename == '') {
-        filename = 'schedule';
-    }
-
-    $('#saveScheduleDownloadLink').attr('download', `${filename}.schedule`);
-});
-
-$('#saveScheduleDownloadLink').on('click', function() {
-    $('#saveScheduleModal').modal('hide');
-});
-
-$('#loadScheduleButton').on('click', function () {
-    // reset modal before showing modal
-    $('#loadScheduleFileInput').val('');
-    $('#loadScheduleLoadButton').addClass('disabled');
-    $('#loadScheduleFileInputFeedback').hide();
-    $('#loadScheduleModal').modal('show');
-});
-
-$('#loadScheduleFileInput').on('change', function () {
-    var inputValue = $('#loadScheduleFileInput').val();
-    if (inputValue != "") {
-        $('#loadScheduleLoadButton').removeClass('disabled');
-    }
-});
-
-$('#loadScheduleLoadButton').on('click', function () {
-
-    // verify that the button is not disabled
-    var disabled = $('#loadScheduleLoadButton').prop('disabled');
-    if (disabled) { return; }
-
-    // attempt to load and read file
-    var inputFile = $('#loadScheduleFileInput').prop('files')[0];
-    if (inputFile != null) {
-        var reader = new FileReader();
-        reader.onload = function (evt) {
-            // if file was successfully read
-            const fileContents = evt.target.result;
-            var {success, contents } = verifyScheduleFile(fileContents);
-            if (!success) {
-                $('#loadScheduleFileInputFeedback').show();
-                $('#loadScheduleFileInputFeedback span').text('Invalid schedule file.');
-            } else {
-                var confirmResponse = confirm('This will clear your current schedule. Are you sure you want to continue?');
-                if (!confirmResponse) { return; }
-
-                classes = contents;
-                saveClassInfo();
-                calculateInterval();
-                draw();
-                $('#loadScheduleModal').modal('hide');
-            }
-        }
-        reader.onerror = function (evt) {
-            $('#loadScheduleFileInputFeedback').show();
-            $('#loadScheduleFileInputFeedback span').text('An error occurred while reading the file.');
-        }
-        reader.readAsText(inputFile);
-    } else {
-        $('#loadScheduleFileInputFeedback').show();
-        $('#loadScheduleFileInputFeedback span').text('No file input detected.');
-    }
-});
-
 $('#resetButton').on('click', function () {
 
     var confirmResponse = confirm('Are you sure? This will clear the current schedule.');
@@ -791,6 +710,7 @@ $('#viewSchedulesNewScheduleButton').on('click', function() {
 
 $('#viewScheduleUploadScheduleButton').on('click', function () {
     $('#uploadScheduleFileInput').val('');
+    $('#uploadScheduleFileInputFeedback').hide();
     $('#uploadScheduleUploadButton').addClass('disabled');
     $('#viewSchedulesModal').modal('hide');
     $('#uploadScheduleModal').modal('show');
