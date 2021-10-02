@@ -93,13 +93,6 @@ function draw() {
         classBox.addClass('custombg-' + classInfo.color);
         classBox.css('z-index', Math.round(99 - classBoxHeight / 10));
 
-        if (classBoxHeight <= 65) {
-            classBox.addClass('very-small');
-        }
-        else if (classBoxHeight <= 90) {
-            classBox.addClass('small');
-        }
-
         // create title element
         var cbDisplayName = $('<div></div>');
         cbDisplayName.addClass('class-box-title');
@@ -138,6 +131,28 @@ function draw() {
                 }
 
                 clone.css('top', -1 * bottomOffset - totalHeight);
+
+                // set class based on children height
+                var totalChildrenHeight = 0;
+                clone.children().each(function(){
+                    totalChildrenHeight += $(this).outerHeight(true);
+                });
+
+                totalClassBoxHeight = clone.outerHeight(true);
+
+                if (totalClassBoxHeight - totalChildrenHeight < 20) {
+                    clone.addClass('small');
+
+                    totalChildrenHeight = 0;
+                    clone.children().each(function(){
+                        totalChildrenHeight += $(this).outerHeight(true);
+                    });
+
+                    if (totalClassBoxHeight - totalChildrenHeight < 10) {
+                        clone.removeClass('small');
+                        clone.addClass('very-small');
+                    }
+                }
             }
         }
     }
@@ -682,13 +697,13 @@ $('#saveAsPNGButton').on('click', function() {
     $('#titlecontainer').hide();
     $('#scheduleNameContainer').children('.schedule-name').text(currentSchedule);
     $('#scheduleNameContainer').show();
-    $('#controlscontainer').hide();
+    $('#controlscontainer').children().hide();
     html2canvas($('body')[0]).then((canvas) => {
         canvas.toBlob(function (blob) {
             saveAs(blob, currentSchedule + '.png');
             $('#scheduleNameContainer').hide();
             $('#titlecontainer').show();
-            $('#controlscontainer').show();
+            $('#controlscontainer').children().show();
         });
     });
 });
