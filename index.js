@@ -679,11 +679,12 @@ $('#editClassRemoveButton').on('click', function(event) {
 });
 
 $('#saveAsPNGButton').on('click', function() {
+    
     $('#titlecontainer').children().hide();
     $('#controlscontainer').hide();
     html2canvas($('body')[0]).then((canvas) => {
         canvas.toBlob(function (blob) {
-            saveAs(blob, "schedule.png");
+            saveAs(blob, currentSchedule + '.png');
             $('#titlecontainer').children().show();
             $('#controlscontainer').show();
         });
