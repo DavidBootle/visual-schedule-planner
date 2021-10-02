@@ -70,6 +70,11 @@ function draw() {
 
     /* note that timeboxHeight is the unit for the number of pixels in an hour */
     // draw classes
+
+    if (classes == null) {
+        schedules[defaultScheduleName] = {};
+        setCurrentSchedule(defaultScheduleName);
+    }
     for (const classID in classes) {
         const classInfo = classes[classID];
         
@@ -452,15 +457,15 @@ function parseNewScheduleName(newName) {
     // make sure the name isn't a duplicate
     while (schedules[newName] != null) {
 
-        var match = newName.match(/^(?<characters>.*?)(?<digits>\d+)$/);
+        var match = newName.match(/^(?<characters>.*?)[ ]*\((?<digits>\d+)\)$/);
 
         // if newName ends in digits, increment the ending digits
         if (match != null) {
             var digits = parseInt(match.groups.digits);
             digits++;
-            newName = match.groups.characters + digits.toString();
+            newName = match.groups.characters + ` (${digits})`;
         } else {
-            newName = newName + '1';
+            newName = newName + ` (1)`;
         }
     }
     return newName;
