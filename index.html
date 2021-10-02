@@ -47,7 +47,7 @@
             </div>
         </div>
         <div id="controlscontainer">
-            <button class="btn btn-primary" id="addClassButton">Add Class</button>
+            <button class="btn btn-primary" id="addClassButton">Add Event</button>
             <button class="btn btn-secondary" id="saveAsPNGButton">Save as PNG</button>
             <button class="btn btn-secondary" id="viewSchedulesButton">View Schedules</button>
             <button class="btn btn-danger" id="resetButton">Reset</button>
@@ -56,19 +56,19 @@
         <div id="addClassModal" class="modal" tabindex="-1">
             <div class="modal-dialog"><div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add a Class</h5>
+                    <h5 class="modal-title">Add Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addClassForm">
                         <div class="form-floating mb-3 has-validation">
                             <input id="addClassDisplayName" type="text" class="form-control" placeholder="English 101" name="displayName"/>
-                            <label for="addClassDisplayName" class="form-label">Display Name</label>
+                            <label for="addClassDisplayName" class="form-label">Event Name</label>
                             <div class="invalid-feedback">Cannot be empty.</div>
                         </div>
                         <div class="form-floating mb-3 has-validation">
                             <input id="addClassClassID" type="text" class="form-control" placeholder="ENG-101-001"/>
-                            <label for="addClassClassID" class="form-label">Class ID</label>
+                            <label for="addClassClassID" class="form-label">Event ID</label>
                             <div class="invalid-feedback" id="addClassClassIDFeedback">Cannot be empty.</div>
                         </div>
                         <div class="form-floating mb-3 has-validation">
@@ -135,12 +135,12 @@
                         <input id="editClassOldClassID" type="hidden"/>
                         <div class="form-floating mb-3 has-validation">
                             <input id="editClassDisplayName" type="text" class="form-control" placeholder="English 101" name="displayName"/>
-                            <label for="editClassDisplayName" class="form-label">Display Name</label>
+                            <label for="editClassDisplayName" class="form-label">Event Name</label>
                             <div class="invalid-feedback">Cannot be empty.</div>
                         </div>
                         <div class="form-floating mb-3 has-validation">
                             <input id="editClassClassID" type="text" class="form-control" placeholder="ENG-101-001"/>
-                            <label for="editClassClassID" class="form-label">Class ID</label>
+                            <label for="editClassClassID" class="form-label">Event ID</label>
                             <div class="invalid-feedback" id="editClassClassIDFeedback">Cannot be empty.</div>
                         </div>
                         <div class="form-floating mb-3 has-validation">
