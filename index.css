@@ -208,6 +208,14 @@ html, body {
     background-color: #7e1f91 !important;
 }
 
+.custombg-yellow {
+    background-color: #ffd35c !important;
+    color: black;
+}
+.custombg-yellow:hover {
+    background-color: #ccac56 !important;
+}
+
 .class-box .class-box-title {
     font-size: 20px;
     line-height: 20px;
