@@ -947,6 +947,19 @@ $('.settings-day').on('change', function(event) {
     draw();
 });
 
+$('#fullResetButton').on('click', function () {
+    var confirmResponse = confirm('This will clear all schedules and reset all settings. Are you sure you want to continue?');
+
+    if (!confirmResponse) { return; }
+
+    $('#settingsModal').modal('hide');
+    localStorage.clear();
+    loadSettings();
+    loadClassInfo();
+    calculateInterval();
+    draw();
+});
+
 // starting info for creating the app
 loadSettings();
 loadClassInfo();
