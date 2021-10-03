@@ -45,8 +45,6 @@ function draw() {
     // set content column height
     const heightOfRowTotal = $('.dayrow').height();
     const heightOfRowTitle = $('.dayrow:visible .title').outerHeight();
-    console.log('Row Total:', heightOfRowTotal);
-    console.log('Row Title:', heightOfRowTitle);
     $('.dayrow .content').css('height', heightOfRowTotal - heightOfRowTitle);
 
     // set last row border
@@ -624,8 +622,6 @@ function buildSchedulesModal () {
                 } else { // if the changed schedule was not the active schedule
                     buildSchedulesModal();
                 }
-                console.log(schedules);
-                console.log(currentSchedule);
             }
         });
         scheduleRow.children('.schedule-row').children('.schedule-name').on('mouseover', function () {
@@ -915,7 +911,6 @@ $('#settingsButton').on('click', function () {
 
 $('.settings-day').on('change', function(event) {
     var value = $(this).val();
-    console.log(value);
     var checked = $(this).prop('checked');
     
     switch (value) {
