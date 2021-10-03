@@ -32,6 +32,18 @@ html, body {
     text-decoration: underline;
 }
 
+#settingsButton {
+    fill: #6c757d;
+    margin: 2px;
+    width: 34px;
+    height: 34px;
+    transition: fill .15s ease-in-out;
+}
+
+#settingsButton:hover {
+    fill: #5c636a;
+}
+
 #controlscontainer {
     width: 100vw;
     display: flex;

@@ -608,6 +608,23 @@ function setCurrentSchedule(newScheduleName) {
     draw();
 }
 
+function convertToBool(boolString) {
+    switch (boolString) {
+        case 'true':
+            return true;
+        case 'false':
+            return false;
+    }
+}
+
+function getDefault(value, defaultValue) {
+    if (value == null) {
+        return defaultValue;
+    } else {
+        return value;
+    }
+}
+
 // redraw the page when the window size changes
 $(window).on('resize', function () {
     draw();
@@ -778,6 +795,28 @@ $('#uploadScheduleUploadButton').on('click', function () {
 
 $('#uploadScheduleModal').on('hide.bs.modal', function() {
     $('#viewSchedulesModal').modal('show');
+});
+
+$('#settingsButton').on('click', function () {
+    // setup days
+    $('#settingsDaySunday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDaySunday')), false));
+    $('#settingsDayMonday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayMonday')), true));
+    $('#settingsDayTuesday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayTuesday')), true));
+    $('#settingsDayWednesday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayWednesday')), true));
+    $('#settingsDayThursday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayThursday')), true));
+    $('#settingsDayFriday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayFriday')), true));
+    $('#settingsDaySaturday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDaySaturday')), false));
+
+    $('#settingsModal').modal('show');
+});
+
+$('.settings-day').on('change', function(event) {
+    var value = $(this).val();
+    value = value.charAt(0).toUpperCase() + value.slice(1); // capitalize first letter
+    var checked = $(this).prop('checked');
+    console.log(value);
+    console.log(checked);
+    localStorage.setItem('settingsDay' + value, checked.toString());
 });
 
 // starting info for creating the app
