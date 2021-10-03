@@ -18,7 +18,10 @@ var mobileWarningModalShown = false;
 
 const defaultScheduleName = 'Untitled Schedule';
 
-// this function should be run to redraw the page
+/**
+ * The draw function is run to recalculate elements such as class-boxes, timeboxes, and all the elements that make up the visuals.
+ * This should be run anytime data changes that relates to the current schedule or settings.
+ */
 function draw() {
 
     const viewWidth = $('#viewcontainer').width();
@@ -176,7 +179,10 @@ function draw() {
     }
 }
 
-// determine the start and end integer cutoffs
+/**
+ * Calculates the integer intervals for displaying the events based on the current events in the schedule.
+ * This should be called before draw when data relating to the times of the current schedule changes, or when the schedule is changed.
+ */
 function calculateInterval() {
     // reset start and end time
     startTime = null;
@@ -212,6 +218,12 @@ function calculateInterval() {
     }
 }
 
+/**
+ * Sets the visibility of a dayrow based on the bool parameter. Also adds classes to visible rows.
+ * @param {boolean} bool - Controls whether the row should be shown or hidden. A true value will show the row, while a false value will hide it.
+ * @param {string} id - The id of the row element to operate on.
+ * @returns {int} - Returns 1 if the row was shown, and 0 if the row was hidden.
+ */
 function setRowVisibility(bool, id) {
     if (bool) {
         $(id).show();
@@ -224,6 +236,10 @@ function setRowVisibility(bool, id) {
     }
 }
 
+/**
+ * Reliably gets the length of the schedules list. This is necessary because Object.keys() will occasionally returns keys whose values are null or undefined, and as such, Object.keys().length is unreliable for determining the amount of schedules. 
+ * @returns {int} - The number of schedules.
+ */
 function schedulesLength() {
     var length = 0;
     for (const key in schedules) {
@@ -234,6 +250,11 @@ function schedulesLength() {
     return length;
 }
 
+/**
+ * Generates a string time label from an integer
+ * @param {int} timeInt - An integer from 0-24.
+ * @returns {string} - A string representing the given time in HH:00 AM/PM format.
+ */
 function timeLabelFromInt(timeInt) {
     var pm = false;
     if (timeInt > 12) {
@@ -247,13 +268,11 @@ function timeLabelFromInt(timeInt) {
     return timeString;
 }
 
-function updateTimeIntervals(start, end) {
-    startTime = start;
-    endTime = end;
-    calculateInterval();
-    draw();
-}
-
+/**
+ * Parses a time string into a decimal time.
+ * @param {string} timeString - A string representing the time in HH:MM AM/PM format.
+ * @returns {number} - A decimal number from between 0-24 representing the given time string.
+ */
 function parseTimeStringToDecimal(timeString) {
     const parsingRegex = /^(?<hours>\d{1,2}):(?<minutes>\d{2})[ ]*(?<ending>(AM|PM))$/i;
     var match = parsingRegex.exec(timeString);
@@ -274,6 +293,12 @@ function parseTimeStringToDecimal(timeString) {
     return time;
 }
 
+/**
+ * Parses a decimal time number into a human-readable time string.
+ * @param {number} time - A decimal number from 0-24.
+ * @param {boolean} [useSpaces=true] - Whether or not put spaces between the time and the AM/PM.
+ * @returns {string} - A human readable time string in HH:MM AM/PM format.
+ */
 function parseDecimalTimeToString(time, useSpaces = true) {
     var hours = Math.floor(time);
     var minutes = Math.round((time - hours) * 60);
@@ -296,6 +321,10 @@ function parseDecimalTimeToString(time, useSpaces = true) {
     return `${hoursString}:${minutesString}${( useSpaces ? ' ' : '' )}${( pm ? 'PM' : 'AM' )}`;
 }
 
+/**
+ * Loads schedules information from localStorage into local variables.
+ * This function should probably be called loadScheduleInfo, as that is more accurate, but it was originally used for loading individual schedules before multi-schedule support. A refactor is probably in order for the future.
+ */
 function loadClassInfo() {
     var jsonSchedulesInfo = window.localStorage.getItem('schedules');
     currentSchedule = window.localStorage.getItem('currentSchedule');
@@ -315,6 +344,9 @@ function loadClassInfo() {
     classes = schedules[currentSchedule];
 }
 
+/**
+ * Loads settings information from localStorage into local variables.
+ */
 function loadSettings() {
 
     // days
@@ -328,6 +360,9 @@ function loadSettings() {
     settings.daysEnabled[6] = getDefault(convertToBool(localStorage.getItem('settingsDaySaturday')), false);
 }
 
+/**
+ * Saves all schedule information from local variables into localStorage.
+ */
 function saveClassInfo() {
     schedules[currentSchedule] = classes;
     var jsonSchedulesInfo = JSON.stringify(schedules);
@@ -335,6 +370,9 @@ function saveClassInfo() {
     window.localStorage.setItem('currentSchedule', currentSchedule);
 }
 
+/**
+ * Saves settings from local variables into localStorage.
+ */
 function saveSettings() {
     
     // days
@@ -347,11 +385,20 @@ function saveSettings() {
     localStorage.setItem('settingsDaySaturday', settings.daysEnabled[6]);
 }
 
+/**
+ * Sets the preview box color in either the editClass or addClass modal.
+ * Should be run when the color select is changed.
+ * @param {string} prefix - either editClass or addClass depending on which modal
+ */
 function setPreviewBoxColor(prefix) {
     var colorOption = $(`#${prefix}Color`).val();
     $('.color-preview-box').attr('class', 'input-group-text color-preview-box custombg-' + colorOption);
 }
 
+/**
+ * Loads the edit class modal with the proper values when a class is clicked.
+ * @param {string} classID 
+ */
 function editClass(classID) {
     const classInfo = classes[classID];
 
@@ -382,6 +429,10 @@ function editClass(classID) {
     $('#editClassModal').modal('show');
 }
 
+/**
+ * Uses settings to determine whether to hide or show day options in the editClass or addClass modals.
+ * @param {string} prefix - Either editClass or addClass depending on which modal it is.
+ */
 function hideHiddenDayOptions(prefix) {
     if (settings.daysEnabled[0]) {
         $(`#${prefix}DaySunday`).parent().show();
@@ -420,6 +471,30 @@ function hideHiddenDayOptions(prefix) {
     }
 }
 
+/**
+ * The object that contains information for a given class.
+ * @typedef {Object} ClassInfo
+ * @property {string} displayName - The display name of the class
+ * @property {number} startTime - The start time of the class, stored as a decimal number from 0-24
+ * @property {number} endTime - The end time of the class, stored as a decimal number from 0-24
+ * @property {Array<boolean>} days - An array with 7 booleans denoting what days the class is on. The first value in the array is Sunday, and the last is Saturday. Each value should be either true (class is enabled on that day), or false (class is not enabled on that day)
+ * @property {string} color - The display color of the class
+ */
+
+/**
+ * The object returned by parseClassInfo.
+ * @typedef {Object} ParseClassInfoReturn
+ * @property {boolean} invalid - Whether the inputted values were invalid. If this value returns true, the returned information should not be saved.
+ * @property {string} classID - The class ID of the returned class object.
+ */
+
+/**
+ * Parses modal information into a classInfo object. Also performs validation for inputted values.
+ * @param {string} prefix - either editClass or addClass, depending on which modal it is.
+ * @param {boolean} editingMode - Controls whether to check for duplicates as part of the validation process. If set to true, the duplication check will be skipped.
+ * @param {ClassInfo} classInfo - The ClassInfo object, parsed from the inputs in the modals.
+ * @returns {ParseClassInfoReturn}
+ */
 function parseClassInfo(prefix, editingMode) {
     var invalid = false;
     var classInfo = {};
@@ -499,6 +574,25 @@ function parseClassInfo(prefix, editingMode) {
     }
 }
 
+/**
+ * An object representing the contens of a schedule file.
+ * @typedef {Object} ScheduleFile
+ * @property {string} name - The name of the schedule
+ * @property {Array<ClassInfo>} classes - A list of classes in the form of ClassInfo objects
+ */
+
+/**
+ * An object that represents the return value of verifyScheduleFile
+ * @typedef {Object} VerifyScheduleFileReturn
+ * @property {boolean} success - Whether or not the schedule is valid.
+ * @property {ScheduleFile} contents - The contents of the schedule file, in object form.
+ */
+
+/**
+ * Verifies schedule file contents.
+ * @param {string} fileContents - The contents of the actual file, as a string of text
+ * @returns {VerifyScheduleFileReturn} - An object consisting of success and contents
+ */
 function verifyScheduleFile(fileContents) {
     var scheduleFileObject;
     var contents;
@@ -577,6 +671,11 @@ function verifyScheduleFile(fileContents) {
     return { success: true, contents: scheduleFileObject };
 }
 
+/**
+ * Parses a new schedule name to avoid duplicates.
+ * @param {string} newName - The unverified new name.
+ * @returns {string} - If the name did not conflict with any other schedule name, then the returned value is the same. Otherwise, it is slightly modified to avoid conflicts.
+ */
 function parseNewScheduleName(newName) {
     // make sure the name isn't a duplicate
     while (schedules[newName] != null) {
@@ -595,6 +694,9 @@ function parseNewScheduleName(newName) {
     return newName;
 }
 
+/**
+ * Builds the viewSchedules modal. Should be called whenever any top-level schedule information is updated.
+ */
 function buildSchedulesModal () {
     // build schedules modal
     $('#viewSchedulesSchedulesList').empty(scheduleRow);
@@ -706,6 +808,10 @@ function buildSchedulesModal () {
     }
 }
 
+/**
+ * Sets the current schedule by updating currentSchedule, updating classes, saving class info, rebuilding the schedules modal, and redrawing.
+ * @param {string} newScheduleName - the schedule id of the schedule to switch to.
+ */
 function setCurrentSchedule(newScheduleName) {
     currentSchedule = newScheduleName;
     classes = schedules[currentSchedule];
@@ -715,6 +821,11 @@ function setCurrentSchedule(newScheduleName) {
     draw();
 }
 
+/**
+ * Converts a boolean represented as a string into a boolean, since javascript is unreliable.
+ * @param {string} boolString - a string that represents a boolean, either 'true' or 'false'
+ * @returns {boolean?} - returns true or false based on the boolString parameter, or null if boolString was not 'true' or 'false'
+ */
 function convertToBool(boolString) {
     switch (boolString) {
         case 'true':
@@ -724,6 +835,12 @@ function convertToBool(boolString) {
     }
 }
 
+/**
+ * Detects whether value is null. If value is not null, then value is returned, otherwise, defaultValue is returned.
+ * @param {*} value 
+ * @param {*} defaultValue 
+ * @returns {*} - value is value is not null, otherwise defaultValue
+ */
 function getDefault(value, defaultValue) {
     if (value == null) {
         return defaultValue;
@@ -732,6 +849,10 @@ function getDefault(value, defaultValue) {
     }
 }
 
+/**
+ * Checks whether or not to display the mobileWarningModal based on the size of the screen.
+ * If the screen size is under a certain threshold, it dislays the mobileWarningModal.
+ */
 function checkMobileWarning() {
     const viewHeight = $(window).height();
     const viewWidth = $(window).width();
@@ -741,11 +862,17 @@ function checkMobileWarning() {
     }
 }
 
-// redraw the page when the window size changes
+/**
+ * Runs draw whenever the page size changes.
+ */
 $(window).on('resize', function () {
     draw();
 });
 
+/**
+ * Sets default values for all the inputs on the add class modal.
+ * Run when the Add Class button is clicked.
+ */
 $('#addClassButton').on('click', function () {
     // reset form values
     $('#addClassDisplayName').val('');
@@ -772,6 +899,10 @@ $('#addClassButton').on('click', function () {
     setPreviewBoxColor('addClass');
 });
 
+/**
+ * Handler for submission of add class form.
+ * Updates the schedule by validating and adding a new class.
+ */
 $('#addClassForm').on('submit', function (event) {
     event.preventDefault();
 
@@ -787,6 +918,10 @@ $('#addClassForm').on('submit', function (event) {
     }
 });
 
+/**
+ * Handler for submission of edit class form.
+ * Updates the schedule by updating a class.
+ */
 $('#editClassForm').on('submit', function (event) {
     event.preventDefault();
 
@@ -806,14 +941,24 @@ $('#editClassForm').on('submit', function (event) {
     }
 })
 
+/**
+ * Updates the preview box color when the color option is changed.
+ */
 $('#addClassColor').on('change', function () {
     setPreviewBoxColor('addClass');
 });
 
+/**
+ * Updates the preview box color when the color option is changed.
+ */
 $('#editClassColor').on('change', function () {
     setPreviewBoxColor('editClass');
 });
 
+/**
+ * Handler for edit class remove button
+ * Removes a class from the current schedule.
+ */
 $('#editClassRemoveButton').on('click', function(event) {
     event.preventDefault();
 
@@ -830,6 +975,10 @@ $('#editClassRemoveButton').on('click', function(event) {
     draw();
 });
 
+/**
+ * Handler for save as png button
+ * Manages logic for saving a png of the current schedule.
+ */
 $('#saveAsPNGButton').on('click', function() {
     $('#titlecontainer').hide();
     $('#scheduleNameContainer').children('.schedule-name').text(currentSchedule);
@@ -845,17 +994,29 @@ $('#saveAsPNGButton').on('click', function() {
     });
 });
 
+/**
+ * Handler for View Schedules button
+ * Builds and opens the schedules modal
+ */
 $('#viewSchedulesButton').on('click', function () {
     buildSchedulesModal();
     $('#viewSchedulesModal').modal('show');
 });
 
+/**
+ * Handler for view schedules new schedule button
+ * Adds a new schedule
+ */
 $('#viewSchedulesNewScheduleButton').on('click', function() {
     var newScheduleName = parseNewScheduleName(defaultScheduleName);
     schedules[newScheduleName] = {};
     setCurrentSchedule(newScheduleName);
 });
 
+/**
+ * Handler for view schedules upload schedule button
+ * Resets and opens the upload schedule modal
+ */
 $('#viewScheduleUploadScheduleButton').on('click', function () {
     $('#uploadScheduleFileInput').val('');
     $('#uploadScheduleFileInputFeedback').hide();
@@ -864,6 +1025,10 @@ $('#viewScheduleUploadScheduleButton').on('click', function () {
     $('#uploadScheduleModal').modal('show');
 });
 
+/**
+ * Handler for the changing of the upload schedule file input
+ * Determines whether there is input and enables the upload button accordingly
+ */
 $('#uploadScheduleFileInput').on('change', function () {
     var inputValue = $('#uploadScheduleFileInput').val();
     if (inputValue != "") {
@@ -871,6 +1036,10 @@ $('#uploadScheduleFileInput').on('change', function () {
     }
 });
 
+/**
+ * Handler for the upload schedule modal upload button
+ * Parses and loads the new schedule based on the inputted schedule file
+ */
 $('#uploadScheduleUploadButton').on('click', function () {
 
     // verify that the button is not disabled
@@ -913,10 +1082,18 @@ $('#uploadScheduleUploadButton').on('click', function () {
     }
 });
 
+/**
+ * Handler for closing of upload schedule modal
+ * Opens the view schedules modal
+ */
 $('#uploadScheduleModal').on('hide.bs.modal', function() {
     $('#viewSchedulesModal').modal('show');
 });
 
+/**
+ * Handler for the settings button
+ * Sets the correct values and opens the settings modal
+ */
 $('#settingsButton').on('click', function () {
     // setup days
     $('#settingsDaySunday').prop('checked', settings.daysEnabled[0]);
@@ -930,6 +1107,10 @@ $('#settingsButton').on('click', function () {
     $('#settingsModal').modal('show');
 });
 
+/**
+ * Handler for the changing of day checkboxes in the settings modal
+ * Sets the correct values in settings
+ */
 $('.settings-day').on('change', function(event) {
     var value = $(this).val();
     var checked = $(this).prop('checked');
@@ -963,6 +1144,10 @@ $('.settings-day').on('change', function(event) {
     draw();
 });
 
+/**
+ * Handler for the full reset button in the schedules modal
+ * Resets localStorage
+ */
 $('#fullResetButton').on('click', function () {
     var confirmResponse = confirm('This will clear all schedules and reset all settings. Are you sure you want to continue?');
 
@@ -976,7 +1161,7 @@ $('#fullResetButton').on('click', function () {
     draw();
 });
 
-// starting info for creating the app
+// start the app
 loadSettings();
 loadClassInfo();
 calculateInterval();
