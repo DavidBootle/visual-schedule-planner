@@ -543,8 +543,9 @@ function verifyScheduleFile(fileContents) {
         }
 
         // verify days
-        if (classInfo.days == null || !Array.isArray(classInfo.days) || (classInfo.days.length >= 5 && classInfo.days.length <= 7)) {
+        if (classInfo.days == null || !Array.isArray(classInfo.days) || !(classInfo.days.length >= 5 && classInfo.days.length <= 7)) {
             console.log('days verification failed');
+            console.log(classInfo.days);
             return { success: false, contents: null };
         }
 
