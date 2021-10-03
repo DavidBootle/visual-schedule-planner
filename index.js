@@ -459,7 +459,7 @@ function parseClassInfo(prefix, editingMode) {
     }
 
     var endTime = parseTimeStringToDecimal($(`#${prefix}EndTime`).val());
-    if (startTime == null) {
+    if (endTime == null) {
         invalid = true;
         $(`#${prefix}EndTime`).addClass('is-invalid');
     } else {
