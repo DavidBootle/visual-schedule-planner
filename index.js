@@ -224,6 +224,16 @@ function setRowVisibility(bool, id) {
     }
 }
 
+function schedulesLength() {
+    var length = 0;
+    for (const key in schedules) {
+        if (schedules[key] != null) {
+            length++;
+        }
+    }
+    return length;
+}
+
 function timeLabelFromInt(timeInt) {
     var pm = false;
     if (timeInt > 12) {
@@ -545,7 +555,6 @@ function verifyScheduleFile(fileContents) {
         // verify days
         if (classInfo.days == null || !Array.isArray(classInfo.days) || !(classInfo.days.length >= 5 && classInfo.days.length <= 7)) {
             console.log('days verification failed');
-            console.log(classInfo.days);
             return { success: false, contents: null };
         }
 
@@ -668,7 +677,7 @@ function buildSchedulesModal () {
             // was this schedule the active schedule
             if (currentSchedule == scheduleName) {
                 // if the schedule was the last schedule, then add a new default schedule and set it as the current schedule
-                if (Object.keys(schedules).length == 0) {
+                if (schedulesLength() == 0) {
                     schedules[defaultScheduleName] = {};
                     setCurrentSchedule(defaultScheduleName);
                     return;
