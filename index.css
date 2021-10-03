@@ -224,6 +224,22 @@ html, body {
     background-color: #c48139 !important;
 }
 
+.custombg-pink {
+    background-color: #eb6093 !important;
+    color: black;
+}
+.custombg-pink:hover {
+    background-color: #b53161 !important;
+}
+
+.custombg-lightblue {
+    background-color: #86d5e3 !important;
+    color: black;
+}
+.custombg-lightblue:hover {
+    background-color: #57a7b5 !important;
+}
+
 .class-box .class-box-title {
     font-size: 20px;
     line-height: 20px;
