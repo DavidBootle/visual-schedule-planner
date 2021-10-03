@@ -216,6 +216,14 @@ html, body {
     background-color: #ccac56 !important;
 }
 
+.custombg-orange {
+    background-color: #ff9a2e !important;
+    color: black;
+}
+.custombg-orange:hover {
+    background-color: #c48139 !important;
+}
+
 .class-box .class-box-title {
     font-size: 20px;
     line-height: 20px;
