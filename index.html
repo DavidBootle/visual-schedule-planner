@@ -4,12 +4,12 @@
         <!-- <link href="bootstrap-4/bootstrap.min.css" type="text/css" rel="stylesheet"/>
         <script src="bootstrap-4/bootstrap.min.js" type="text/javascript"></script> -->
         <link href="index.css" type="text/css" rel="stylesheet"/>
-        <script src="jquery/jquery-3.6.0.js" type="text/javascript"></script>
         <link href="bootstrap/bootstrap.min.css" type="text/css" rel="stylesheet"/>
         <script src="bootstrap/bootstrap.min.js" type="text/javascript"></script>
         <script src="addonscripts/html2canvas.min.js" type="text/javascript"></script>
         <script src="addonscripts/FileSaver.min.js" type="text/javascript"></script>
         <script src="addonscripts/svg-inject.min.js" type="text/javascript"></script>
+        <script src="jquery/jquery-3.6.0.js" type="text/javascript"></script>
         <title>Visual Schedule Planner</title>
     </head>
     <body>
@@ -303,6 +303,19 @@
                     <h4>Full Reset</h4>
                     <p>This option will completely reset all settings, schedules, and all other information. It is essentially a factory reset, and cannot be undone.</p>
                     <button class="btn btn-danger" id="fullResetButton">Reset</button>
+                </div>
+            </div></div>
+        </div>
+
+        <div id="mobileWarningModal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-fullscreen"><div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Screen Size Too Small</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This site is designed for desktop sized screens. Your current device may not be big enough for proper functionality. Thank you for understanding.</p>
+                    <button class="btn btn-danger" onclick="$('#mobileWarningModal').modal('hide')">Continue anyway</button>
                 </div>
             </div></div>
         </div>

@@ -14,6 +14,8 @@ var currentSchedule = '';
 
 var settings = {};
 
+var mobileWarningModalShown = false;
+
 const defaultScheduleName = 'Untitled Schedule';
 
 // this function should be run to redraw the page
@@ -720,6 +722,15 @@ function getDefault(value, defaultValue) {
     }
 }
 
+function checkMobileWarning() {
+    const viewHeight = $(window).height();
+    const viewWidth = $(window).width();
+
+    if ((viewWidth < 1000 || viewHeight < 300) && !mobileWarningModalShown) {
+        $('#mobileWarningModal').modal('show');
+    }
+}
+
 // redraw the page when the window size changes
 $(window).on('resize', function () {
     draw();
@@ -960,3 +971,4 @@ loadSettings();
 loadClassInfo();
 calculateInterval();
 draw();
+setTimeout(checkMobileWarning, 1000);
