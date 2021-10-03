@@ -92,10 +92,6 @@ html, body {
     border-bottom: 1px solid gray;
 }
 
-.dayrow:last-of-type .content {
-    border-right: 1px solid gray;
-}
-
 .dayrow .content .timebox {
     border-bottom: 1px solid lightgray;
     box-sizing: border-box;

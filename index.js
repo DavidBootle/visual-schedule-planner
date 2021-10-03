@@ -12,6 +12,8 @@ var classes = {};
 var schedules = {};
 var currentSchedule = '';
 
+var settings = {};
+
 const defaultScheduleName = 'Untitled Schedule';
 
 // this function should be run to redraw the page
@@ -21,19 +23,34 @@ function draw() {
     const viewHeight = $('#viewcontainer').height();
 
     // set all row heights
-    $('.row').css('height', viewHeight);
+    $('.dayrow').css('height', viewHeight);
+    $('.timesrow').css('height', viewHeight);
 
     // set times row width
     $('.timesrow').css('width', viewWidth * timesRowWidthMultiplier);
 
+    // hide or show day columns depending on settings
+    var numOfDays = 0;
+    numOfDays += setRowVisibility(settings.daysEnabled[0], '#dayrowSunday');
+    numOfDays += setRowVisibility(settings.daysEnabled[1], '#dayrowMonday');
+    numOfDays += setRowVisibility(settings.daysEnabled[2], '#dayrowTuesday');
+    numOfDays += setRowVisibility(settings.daysEnabled[3], '#dayrowWednesday');
+    numOfDays += setRowVisibility(settings.daysEnabled[4], '#dayrowThursday');
+    numOfDays += setRowVisibility(settings.daysEnabled[5], '#dayrowFriday');
+    numOfDays += setRowVisibility(settings.daysEnabled[6], '#dayrowSaturday');
+
     // set day row widths
-    const numOfDays = $('.dayrow').length;
     $('.dayrow').css('width', viewWidth * (1-timesRowWidthMultiplier) / numOfDays);
     
     // set content column height
     const heightOfRowTotal = $('.dayrow').height();
-    const heightOfRowTitle = $('.dayrow .title').outerHeight();
+    const heightOfRowTitle = $('.dayrow:visible .title').outerHeight();
+    console.log('Row Total:', heightOfRowTotal);
+    console.log('Row Title:', heightOfRowTitle);
     $('.dayrow .content').css('height', heightOfRowTotal - heightOfRowTitle);
+
+    // set last row border
+    $('.dayrow:visible').last().children('.content').css('border-right', '1px solid gray');
 
     // empty content to prepare for drawing
     $('.dayrow .content').empty();
@@ -112,7 +129,8 @@ function draw() {
         classBox.append(cbTime);
 
         // draw classBox
-        for (var i = 0; i < numOfDays; i++) {
+        for (var i = 0; i < 7; i++) {
+
             if (classInfo.days[i]) {
                 var clone = classBox.clone();
                 // register classBox onclick
@@ -191,6 +209,18 @@ function calculateInterval() {
     } 
     if (Math.abs(endInt - endTime) < 0.2) {
         endInt += 1;
+    }
+}
+
+function setRowVisibility(bool, id) {
+    if (bool) {
+        $(id).show();
+        $(id).addClass('dayrow-visible');
+        return 1;
+    } else {
+        $(id).hide();
+        $(id).removeClass('dayrow-visible');
+        return 0;
     }
 }
 
@@ -275,11 +305,36 @@ function loadClassInfo() {
     classes = schedules[currentSchedule];
 }
 
+function loadSettings() {
+
+    // days
+    settings.daysEnabled = [false, false, false, false, false, false, false];
+    settings.daysEnabled[0] = getDefault(convertToBool(localStorage.getItem('settingsDaySunday')), false);
+    settings.daysEnabled[1] = getDefault(convertToBool(localStorage.getItem('settingsDayMonday')), true);
+    settings.daysEnabled[2] = getDefault(convertToBool(localStorage.getItem('settingsDayTuesday')), true);
+    settings.daysEnabled[3] = getDefault(convertToBool(localStorage.getItem('settingsDayWednesday')), true);
+    settings.daysEnabled[4] = getDefault(convertToBool(localStorage.getItem('settingsDayThursday')), true);
+    settings.daysEnabled[5] = getDefault(convertToBool(localStorage.getItem('settingsDayFriday')), true);
+    settings.daysEnabled[6] = getDefault(convertToBool(localStorage.getItem('settingsDaySaturday')), false);
+}
+
 function saveClassInfo() {
     schedules[currentSchedule] = classes;
     var jsonSchedulesInfo = JSON.stringify(schedules);
     window.localStorage.setItem('schedules', jsonSchedulesInfo);
     window.localStorage.setItem('currentSchedule', currentSchedule);
+}
+
+function saveSettings() {
+    
+    // days
+    localStorage.setItem('settingsDaySunday', settings.daysEnabled[0]);
+    localStorage.setItem('settingsDayMonday', settings.daysEnabled[1]);
+    localStorage.setItem('settingsDayTuesday', settings.daysEnabled[2]);
+    localStorage.setItem('settingsDayWednesday', settings.daysEnabled[3]);
+    localStorage.setItem('settingsDayThursday', settings.daysEnabled[4]);
+    localStorage.setItem('settingsDayFriday', settings.daysEnabled[5]);
+    localStorage.setItem('settingsDaySaturday', settings.daysEnabled[6]);
 }
 
 function setPreviewBoxColor(prefix) {
@@ -303,14 +358,56 @@ function editClass(classID) {
     setPreviewBoxColor('editClass');
 
     // update weekday checks
-    $('#editClassDayMonday').prop('checked', classInfo.days[0]);
-    $('#editClassDayTuesday').prop('checked', classInfo.days[1]);
-    $('#editClassDayWednesday').prop('checked', classInfo.days[2]);
-    $('#editClassDayThursday').prop('checked', classInfo.days[3]);
-    $('#editClassDayFriday').prop('checked', classInfo.days[4]);
+    $('#editClassDaySunday').prop('checked', classInfo.days[0]);
+    $('#editClassDayMonday').prop('checked', classInfo.days[1]);
+    $('#editClassDayTuesday').prop('checked', classInfo.days[2]);
+    $('#editClassDayWednesday').prop('checked', classInfo.days[3]);
+    $('#editClassDayThursday').prop('checked', classInfo.days[4]);
+    $('#editClassDayFriday').prop('checked', classInfo.days[5]);
+    $('#editClassDaySaturday').prop('checked', classInfo.days[6]);
+
+    hideHiddenDayOptions('editClass');
 
     // show modal
     $('#editClassModal').modal('show');
+}
+
+function hideHiddenDayOptions(prefix) {
+    if (settings.daysEnabled[0]) {
+        $(`#${prefix}DaySunday`).parent().show();
+    } else {
+        $(`#${prefix}DaySunday`).parent().hide();
+    }
+    if (settings.daysEnabled[1]) {
+        $(`#${prefix}DayMonday`).parent().show();
+    } else {
+        $(`#${prefix}DayMonday`).parent().hide();
+    }
+    if (settings.daysEnabled[2]) {
+        $(`#${prefix}DayTuesday`).parent().show();
+    } else {
+        $(`#${prefix}DayTuesday`).parent().hide();
+    }
+    if (settings.daysEnabled[3]) {
+        $(`#${prefix}DayWednesday`).parent().show();
+    } else {
+        $(`#${prefix}DayWednesday`).parent().hide();
+    }
+    if (settings.daysEnabled[4]) {
+        $(`#${prefix}DayThursday`).parent().show();
+    } else {
+        $(`#${prefix}DayThursday`).parent().hide();
+    }
+    if (settings.daysEnabled[5]) {
+        $(`#${prefix}DayFriday`).parent().show();
+    } else {
+        $(`#${prefix}DayFriday`).parent().hide();
+    }
+    if (settings.daysEnabled[6]) {
+        $(`#${prefix}DaySaturday`).parent().show();
+    } else {
+        $(`#${prefix}DaySaturday`).parent().hide();
+    }
 }
 
 function parseClassInfo(prefix, editingMode) {
@@ -359,12 +456,14 @@ function parseClassInfo(prefix, editingMode) {
         $(`#${prefix}EndTime`).removeClass('is-invalid');
     }
 
-    var days = [false, false, false, false, false];
-    days[0] = $(`#${prefix}DayMonday`).is(':checked');
-    days[1] = $(`#${prefix}DayTuesday`).is(':checked');
-    days[2] = $(`#${prefix}DayWednesday`).is(':checked');
-    days[3] = $(`#${prefix}DayThursday`).is(':checked');
-    days[4] = $(`#${prefix}DayFriday`).is(':checked');
+    var days = [false, false, false, false, false, false, false];
+    days[0] = $(`#${prefix}DaySunday`).is(':checked');
+    days[1] = $(`#${prefix}DayMonday`).is(':checked');
+    days[2] = $(`#${prefix}DayTuesday`).is(':checked');
+    days[3] = $(`#${prefix}DayWednesday`).is(':checked');
+    days[4] = $(`#${prefix}DayThursday`).is(':checked');
+    days[5] = $(`#${prefix}DayFriday`).is(':checked');
+    days[6] = $(`#${prefix}DaySaturday`).is(':checked');
 
     var isAllFalse = days.every((value) => {
         return value == false;
@@ -444,7 +543,7 @@ function verifyScheduleFile(fileContents) {
         }
 
         // verify days
-        if (classInfo.days == null || !Array.isArray(classInfo.days) || classInfo.days.length != 5) {
+        if (classInfo.days == null || !Array.isArray(classInfo.days) || (classInfo.days.length >= 5 && classInfo.days.length <= 7)) {
             console.log('days verification failed');
             return { success: false, contents: null };
         }
@@ -640,13 +739,17 @@ $('#addClassButton').on('click', function () {
     $('#addClassStartTime').removeClass('is-invalid');
     $('#addClassEndTime').val('');
     $('#addClassEndTime').removeClass('is-invalid');
+    $('#addClassDaySunday').prop('checked', false);
     $('#addClassDayMonday').prop('checked', false);
     $('#addClassDayTuesday').prop('checked', false);
     $('#addClassDayWednesday').prop('checked', false);
     $('#addClassDayThursday').prop('checked', false);
     $('#addClassDayFriday').prop('checked', false);
+    $('#addClassDaySaturday').prop('checked', false);
     $('#addClassDayFeedback').hide();
     $('#addClassColor').val('blue');
+
+    hideHiddenDayOptions('addClass');
 
     $('#addClassModal').modal('show');
     setPreviewBoxColor('addClass');
@@ -799,27 +902,53 @@ $('#uploadScheduleModal').on('hide.bs.modal', function() {
 
 $('#settingsButton').on('click', function () {
     // setup days
-    $('#settingsDaySunday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDaySunday')), false));
-    $('#settingsDayMonday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayMonday')), true));
-    $('#settingsDayTuesday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayTuesday')), true));
-    $('#settingsDayWednesday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayWednesday')), true));
-    $('#settingsDayThursday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayThursday')), true));
-    $('#settingsDayFriday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDayFriday')), true));
-    $('#settingsDaySaturday').prop('checked', getDefault(convertToBool(localStorage.getItem('settingsDaySaturday')), false));
+    $('#settingsDaySunday').prop('checked', settings.daysEnabled[0]);
+    $('#settingsDayMonday').prop('checked', settings.daysEnabled[1]);
+    $('#settingsDayTuesday').prop('checked', settings.daysEnabled[2]);
+    $('#settingsDayWednesday').prop('checked', settings.daysEnabled[3]);
+    $('#settingsDayThursday').prop('checked', settings.daysEnabled[4]);
+    $('#settingsDayFriday').prop('checked', settings.daysEnabled[5]);
+    $('#settingsDaySaturday').prop('checked', settings.daysEnabled[6]);
 
     $('#settingsModal').modal('show');
 });
 
 $('.settings-day').on('change', function(event) {
     var value = $(this).val();
-    value = value.charAt(0).toUpperCase() + value.slice(1); // capitalize first letter
-    var checked = $(this).prop('checked');
     console.log(value);
-    console.log(checked);
-    localStorage.setItem('settingsDay' + value, checked.toString());
+    var checked = $(this).prop('checked');
+    
+    switch (value) {
+        case 'sunday':
+            settings.daysEnabled[0] = checked;
+            break;
+        case 'monday':
+            settings.daysEnabled[1] = checked;
+            break;
+        case 'tuesday':
+            settings.daysEnabled[2] = checked;
+            break;
+        case 'wednesday':
+            settings.daysEnabled[3] = checked;
+            break;
+        case 'thursday':
+            settings.daysEnabled[4] = checked;
+            break;
+        case 'friday':
+            settings.daysEnabled[5] = checked;
+            break;
+        case 'saturday':
+            settings.daysEnabled[6] = checked;
+            break;
+    }
+
+    saveSettings();
+    calculateInterval();
+    draw();
 });
 
 // starting info for creating the app
+loadSettings();
 loadClassInfo();
 calculateInterval();
 draw();

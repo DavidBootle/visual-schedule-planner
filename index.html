@@ -25,24 +25,32 @@
                 <div class="title"></div>
                 <div class="content"></div>
             </div>
-            <div class="dayrow">
+            <div class="dayrow" id="dayrowSunday">
+                <div class="title">SUN</div>
+                <div class="content"></div>
+            </div>
+            <div class="dayrow" id="dayrowMonday">
                 <div class="title">MON</div>
                 <div class="content"></div>
             </div>
-            <div class="dayrow">
+            <div class="dayrow" id="dayrowTuesday">
                 <div class="title">TUE</div> 
                 <div class="content"></div>
             </div>
-            <div class="dayrow">
+            <div class="dayrow" id="dayrowWednesday">
                 <div class="title">WED</div> 
                 <div class="content"></div>
             </div>
-            <div class="dayrow">
+            <div class="dayrow" id="dayrowThursday">
                 <div class="title">THU</div> 
                 <div class="content"></div>
             </div>
-            <div class="dayrow">
+            <div class="dayrow" id="dayrowFriday">
                 <div class="title">FRI</div> 
+                <div class="content"></div>
+            </div>
+            <div class="dayrow" id="dayrowSaturday">
+                <div class="title">SAT</div>
                 <div class="content"></div>
             </div>
         </div>
@@ -86,6 +94,10 @@
                         </div>
                         <div class="mb-3">
                             <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="addClassDaySunday" value="monday">
+                                <label class="form-check-label" for="addClassDaySunday">SUN</label>
+                            </div>
+                            <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="addClassDayMonday" value="monday">
                                 <label class="form-check-label" for="addClassDayMonday">MON</label>
                             </div>
@@ -104,6 +116,10 @@
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="addClassDayFriday" value="friday">
                                 <label class="form-check-label" for="addClassDayFriday">FRI</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="addClassDaySaturday" value="monday">
+                                <label class="form-check-label" for="addClassDayMonday">SAT</label>
                             </div>
                             <div id="addClassDayFeedback" style="display: none">
                                 <span style="color:red">Must select at least one day.</span>
@@ -158,6 +174,10 @@
                         </div>
                         <div class="mb-3">
                             <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="editClassDaySunday" value="monday">
+                                <label class="form-check-label" for="editClassDaySunday">SUN</label>
+                            </div>
+                            <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="editClassDayMonday" value="monday">
                                 <label class="form-check-label" for="editClassDayMonday">MON</label>
                             </div>
@@ -176,6 +196,10 @@
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="editClassDayFriday" value="friday">
                                 <label class="form-check-label" for="editClassDayFriday">FRI</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="editClassDaySaturday" value="monday">
+                                <label class="form-check-label" for="editClassDaySaturday">SAT</label>
                             </div>
                             <div id="editClassDayFeedback" style="display: none">
                                 <span style="color:red">Must select at least one day.</span>
