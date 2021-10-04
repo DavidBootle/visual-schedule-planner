@@ -53,6 +53,7 @@ function draw() {
     $('.dayrow .content').css('height', heightOfRowTotal - heightOfRowTitle);
 
     // set last row border
+    $('.dayrow').children('.content').css('border-right', 'none');
     $('.dayrow:visible').last().children('.content').css('border-right', '1px solid gray');
 
     // empty content to prepare for drawing
