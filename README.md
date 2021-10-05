@@ -1,10 +1,10 @@
 # Visual Schedule Planner
-A website made to allow for easy visual event scheduling. This project is part of BootleTools, and is free for all users of the internet.
+A website made to allow for easy visual event scheduling. This project is part of [Bootle Tools](https://bootletools.com), and is free for all users of the internet.
 
 NOTE: This project started as 'class-scheduler' but was eventually overhauled to work with generic events, rather than just classes. However, much of the code and documentation still refers to classes rather than events.
 
 ## How to Use
-You can access this project [planner.bootletools.com](https://planner.bootletools.com).
+You can access this project at [planner.bootletools.com](https://planner.bootletools.com) or [bootletools.com/planner](https://bootletools.com/planner).
 
 JSDoc documentation for the javascript code that runs this project can be found at [planner.bootletools.com/docs](https://planner.bootletools.com/docs).
 
