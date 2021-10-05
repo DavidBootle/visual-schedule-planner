@@ -13,7 +13,7 @@ This project was created and programmed by David Bootle ([TheWeirdSquid](https:/
 
 The icon for this project was created by [Artdacity](https://www.youtube.com/channel/UCZdpHt_HQ0952p3TW3g9VTA), and compiled into browser-ready files by [realfavicongenerator.net](https://realfavicongenerator.net). 
 
-The project was created using HTML, CSS, and Javascript and made use of the following tools and frameworks:
+The project was created using HTML, CSS, and Javascript and makes use of the following tools and frameworks:
 - [JQuery](https://jquery.com)
 - [Bootstrap 5](https://getbootstrap.com)
 - [html2canvas](https://github.com/niklasvh/html2canvas)
