@@ -114,23 +114,27 @@ function draw() {
         classBox.addClass('custombg-' + classInfo.color);
         classBox.css('z-index', Math.round(99 - classBoxHeight / 10));
 
+        var cbContainer = $('<div></div>');
+        cbContainer.addClass('class-box-container');
+        classBox.append(cbContainer);
+
         // create title element
         var cbDisplayName = $('<div></div>');
         cbDisplayName.addClass('class-box-title');
         cbDisplayName.text(classInfo.displayName);
-        classBox.append(cbDisplayName);
+        cbContainer.append(cbDisplayName);
 
         // create subtitle element
         var cbClassID = $('<div></div>');
         cbClassID.addClass('class-box-subtitle');
         cbClassID.text(classID);
-        classBox.append(cbClassID);
+        cbContainer.append(cbClassID);
 
         // create time element
         var cbTime = $('<div></div>');
         cbTime.addClass('class-box-subtitle');
         cbTime.text(parseDecimalTimeToString(classInfo.startTime, false) + ' - ' + parseDecimalTimeToString(classInfo.endTime, false));
-        classBox.append(cbTime);
+        cbContainer.append(cbTime);
 
         // draw classBox
         for (var i = 0; i < 7; i++) {
@@ -154,30 +158,82 @@ function draw() {
 
                 clone.css('top', -1 * bottomOffset - totalHeight);
 
-                // set class based on children height
-                var totalChildrenHeight = 0;
-                clone.children().each(function(){
-                    totalChildrenHeight += $(this).outerHeight(true);
-                });
+                // resize text in small boxes to fit
 
-                totalClassBoxHeight = clone.outerHeight(true);
+                let hasBeenAdjusted = false;
+                let prevRatio = 1;
+                let closestSmallRatio = 0;
 
-                if (totalClassBoxHeight - totalChildrenHeight < 20) {
-                    clone.addClass('small');
-
-                    totalChildrenHeight = 0;
-                    clone.children().each(function(){
-                        totalChildrenHeight += $(this).outerHeight(true);
-                    });
-
-                    if (totalClassBoxHeight - totalChildrenHeight < 10) {
-                        clone.removeClass('small');
-                        clone.addClass('very-small');
+                for (let k = 0; k < 100; k++) { // due to text line overflow, it needs to run multiple times
+                    var totalChildrenHeight = clone.children('.class-box-container')[0].offsetHeight;
+                    clone.children('.class-box-container').attr("data-offsetheight", totalChildrenHeight);
+                    let totalClassBoxHeight = clone.outerHeight(true);
+                    let ratio = totalClassBoxHeight / (totalChildrenHeight); // ratio of classBoxHeight to child height
+                    
+                    // if container size is close enough to the box, stop adjusting
+                    if (ratio > 0.95 && ratio < 1.00) {
+                        break;
                     }
+
+                    // handles sizes that are right next to text overflow, and so will loop forever
+                    // if this occurs, select the smallest of the two
+                    if (k == 99) {
+                        newRatio = ratio * prevRatio;
+                        // pick the smallest ratio
+                        if (newRatio > prevRatio) {
+                            ratio = prevRatio;
+                            prevRatio = 1;
+                        } else {
+                            ratio = newRatio;
+                            prevRatio = 1;
+                        }
+                    }
+                    
+                    // update the class-box-container
+                    clone.children('.class-box-container').each(function() {
+                        // if the text is larger than the container,
+                        // or was previously adjusted
+                        if (ratio < 1 || hasBeenAdjusted) {
+                            hasBeenAdjusted = true;
+                            ratio = ratio * prevRatio;
+                            $(this).children(".class-box-title").css('font-size', `${20 * ratio}px`).css('line-height', `${20 * ratio}px`).css('margin-bottom', `${5 * ratio}px`);
+                            $(this).children(".class-box-subtitle").css('font-size', `${12 * ratio}px`).css('line-height', `${12 * ratio}px`).css('margin-bottom', `${5 * ratio}px`);
+                            $(this).css("padding-top", `${20 * ratio}px`);
+                            $(this).css("padding-bottom", `${10 * ratio}px`);
+                            prevRatio = ratio;
+                        }
+                    })
                 }
+
+                // if (totalClassBoxHeight - totalChildrenHeight < 20) {
+                //     clone.addClass('small');
+
+                //     totalChildrenHeight = 0;
+                //     clone.children().each(function(){
+                //         totalChildrenHeight += $(this).outerHeight(true);
+                //     });
+
+                //     if (totalClassBoxHeight - totalChildrenHeight < 10) {
+                //         clone.removeClass('small');
+                //         clone.addClass('very-small');
+                //     }
+                // }
             }
         }
     }
+}
+
+/**
+ * Calculates the width of text of a given font size using HTML canvas properties
+ * Does not modify the DOM
+ */
+function getTextWidth(text, font) {
+    // create a new canvas or use existing
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const context = canvas.getContext("2d");
+    context.font = font;
+    const metrics = context.measureText(text);
+    return metrics.width;
 }
 
 /**
