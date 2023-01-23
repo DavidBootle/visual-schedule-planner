@@ -192,6 +192,16 @@ function draw() {
                         }
                         clone.children('.class-box-container').attr("data-overflow", true);
                     }
+
+                    function dependentRound(n) {
+                        // will round depending on the gradient font size setting
+                        if (settings.gradientFontSize == true) {
+                            console.log("not rounding");
+                            return n;
+                        } else {
+                            return Math.floor(n);
+                        }
+                    }
                     
                     // update the class-box-container
                     clone.children('.class-box-container').each(function() {
@@ -200,8 +210,8 @@ function draw() {
                         if (ratio < 1 || hasBeenAdjusted) {
                             hasBeenAdjusted = true;
                             ratio = ratio * prevRatio;
-                            $(this).children(".class-box-title").css('font-size', `${Math.round(20 * ratio)}px`).css('line-height', `${Math.round(20 * ratio)}px`).css('margin-bottom', `${5 * ratio}px`);
-                            $(this).children(".class-box-subtitle").css('font-size', `${Math.round(12 * ratio)}px`).css('line-height', `${Math.round(12 * ratio)}px`).css('margin-bottom', `${5 * ratio}px`);
+                            $(this).children(".class-box-title").css('font-size', `${dependentRound(20 * ratio)}px`).css('line-height', `${dependentRound(20 * ratio)}px`).css('margin-bottom', `${5 * ratio}px`);
+                            $(this).children(".class-box-subtitle").css('font-size', `${dependentRound(12 * ratio)}px`).css('line-height', `${dependentRound(12 * ratio)}px`).css('margin-bottom', `${5 * ratio}px`);
                             $(this).css("padding-top", `${20 * ratio}px`);
                             $(this).css("padding-bottom", `${10 * ratio}px`);
                             prevRatio = ratio;
@@ -242,7 +252,7 @@ function getTextWidth(text, font) {
  * This should be called before draw when data relating to the times of the current schedule changes, or when the schedule is changed.
  */
 function calculateInterval() {
-    // reset start and end time
+    // reset start and end times
     startTime = null;
     endTime = null;
     startInt = null;
@@ -417,6 +427,7 @@ function loadSettings() {
     settings.daysEnabled[5] = getDefault(convertToBool(localStorage.getItem('settingsDayFriday')), true);
     settings.daysEnabled[6] = getDefault(convertToBool(localStorage.getItem('settingsDaySaturday')), false);
     settings.experimentalScaling = getDefault(convertToBool(localStorage.getItem('experimentalScaling')), false);
+    settings.gradientFontSize = getDefault(convertToBool(localStorage.getItem('gradientFontSize')), false);
 }
 
 /**
@@ -443,6 +454,7 @@ function saveSettings() {
     localStorage.setItem('settingsDayFriday', settings.daysEnabled[5]);
     localStorage.setItem('settingsDaySaturday', settings.daysEnabled[6]);
     localStorage.setItem('experimentalScaling', settings.experimentalScaling);
+    localStorage.setItem('gradientFontSize', settings.gradientFontSize);
 }
 
 /**
@@ -1164,6 +1176,7 @@ $('#settingsButton').on('click', function () {
     $('#settingsDayFriday').prop('checked', settings.daysEnabled[5]);
     $('#settingsDaySaturday').prop('checked', settings.daysEnabled[6]);
     $('#experimentalScaling').prop('checked', settings.experimentalScaling);
+    $('#gradientFontSize').prop('checked', settings.gradientFontSize);
 
     $('#settingsModal').modal('show');
 });
@@ -1200,6 +1213,11 @@ $('.settings-ui').on('change', function(event) {
             break;
         case 'experimentalScaling':
             settings.experimentalScaling = checked;
+            break;
+        case 'gradientFontSize':
+            settings.gradientFontSize = checked;
+            saveSettings();
+            location.reload();
             break;
     }
 
