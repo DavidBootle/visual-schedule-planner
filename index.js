@@ -196,7 +196,6 @@ function draw() {
                     function dependentRound(n) {
                         // will round depending on the gradient font size setting
                         if (settings.gradientFontSize == true) {
-                            console.log("not rounding");
                             return n;
                         } else {
                             return Math.floor(n);
@@ -223,8 +222,18 @@ function draw() {
                         var totalChildrenHeight = clone.children('.class-box-container')[0].offsetHeight;
                         let ratio = totalClassBoxHeight / (totalChildrenHeight); // ratio of classBoxHeight to child height
                         if (ratio > 1) {
+                            // adjust scale
                             clone.children('.class-box-container').css('scale', `${ratio * 100}%`);
-                            console.log(`scaling by ${ratio * 100}%`);
+
+                            // adjust width offset
+                            let width = clone.children('.class-box-container').width();
+                            let offset = (width * ratio - width) / 2;
+                            clone.children('.class-box-container').css("left", `${offset}px`).css('position', 'relative');
+
+                            // adjust height offset
+                            var newHeight = totalChildrenHeight * ratio;
+                            var heightOffset = (newHeight - totalChildrenHeight) / 2;
+                            clone.children('.class-box-container').css("top", `${heightOffset}px`);
                             break;
                         }
                     }
