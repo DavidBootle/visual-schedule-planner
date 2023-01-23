@@ -162,12 +162,15 @@ function draw() {
 
                 let hasBeenAdjusted = false;
                 let prevRatio = 1;
-                let closestSmallRatio = 0;
+
+                let totalClassBoxHeight = clone.outerHeight(true);
+                if (totalClassBoxHeight <= 30) {
+                    clone.addClass('inline');
+                    clone.find('.class-box-subtitle').hide();
+                }
 
                 for (let k = 0; k < 100; k++) { // due to text line overflow, it needs to run multiple times
                     var totalChildrenHeight = clone.children('.class-box-container')[0].offsetHeight;
-                    clone.children('.class-box-container').attr("data-offsetheight", totalChildrenHeight);
-                    let totalClassBoxHeight = clone.outerHeight(true);
                     let ratio = totalClassBoxHeight / (totalChildrenHeight); // ratio of classBoxHeight to child height
                     
                     // if container size is close enough to the box, stop adjusting
@@ -187,6 +190,7 @@ function draw() {
                             ratio = newRatio;
                             prevRatio = 1;
                         }
+                        clone.children('.class-box-container').attr("data-overflow", true);
                     }
                     
                     // update the class-box-container
@@ -196,28 +200,25 @@ function draw() {
                         if (ratio < 1 || hasBeenAdjusted) {
                             hasBeenAdjusted = true;
                             ratio = ratio * prevRatio;
-                            $(this).children(".class-box-title").css('font-size', `${20 * ratio}px`).css('line-height', `${20 * ratio}px`).css('margin-bottom', `${5 * ratio}px`);
-                            $(this).children(".class-box-subtitle").css('font-size', `${12 * ratio}px`).css('line-height', `${12 * ratio}px`).css('margin-bottom', `${5 * ratio}px`);
+                            $(this).children(".class-box-title").css('font-size', `${Math.round(20 * ratio)}px`).css('line-height', `${Math.round(20 * ratio)}px`).css('margin-bottom', `${5 * ratio}px`);
+                            $(this).children(".class-box-subtitle").css('font-size', `${Math.round(12 * ratio)}px`).css('line-height', `${Math.round(12 * ratio)}px`).css('margin-bottom', `${5 * ratio}px`);
                             $(this).css("padding-top", `${20 * ratio}px`);
                             $(this).css("padding-bottom", `${10 * ratio}px`);
                             prevRatio = ratio;
                         }
                     })
+
+                    // perform experimental if enabled
+                    if (k == 99 && settings.experimentalScaling) {
+                        var totalChildrenHeight = clone.children('.class-box-container')[0].offsetHeight;
+                        let ratio = totalClassBoxHeight / (totalChildrenHeight); // ratio of classBoxHeight to child height
+                        if (ratio > 1) {
+                            clone.children('.class-box-container').css('scale', `${ratio * 100}%`);
+                            console.log(`scaling by ${ratio * 100}%`);
+                            break;
+                        }
+                    }
                 }
-
-                // if (totalClassBoxHeight - totalChildrenHeight < 20) {
-                //     clone.addClass('small');
-
-                //     totalChildrenHeight = 0;
-                //     clone.children().each(function(){
-                //         totalChildrenHeight += $(this).outerHeight(true);
-                //     });
-
-                //     if (totalClassBoxHeight - totalChildrenHeight < 10) {
-                //         clone.removeClass('small');
-                //         clone.addClass('very-small');
-                //     }
-                // }
             }
         }
     }
@@ -415,6 +416,7 @@ function loadSettings() {
     settings.daysEnabled[4] = getDefault(convertToBool(localStorage.getItem('settingsDayThursday')), true);
     settings.daysEnabled[5] = getDefault(convertToBool(localStorage.getItem('settingsDayFriday')), true);
     settings.daysEnabled[6] = getDefault(convertToBool(localStorage.getItem('settingsDaySaturday')), false);
+    settings.experimentalScaling = getDefault(convertToBool(localStorage.getItem('experimentalScaling')), false);
 }
 
 /**
@@ -440,6 +442,7 @@ function saveSettings() {
     localStorage.setItem('settingsDayThursday', settings.daysEnabled[4]);
     localStorage.setItem('settingsDayFriday', settings.daysEnabled[5]);
     localStorage.setItem('settingsDaySaturday', settings.daysEnabled[6]);
+    localStorage.setItem('experimentalScaling', settings.experimentalScaling);
 }
 
 /**
@@ -1160,6 +1163,7 @@ $('#settingsButton').on('click', function () {
     $('#settingsDayThursday').prop('checked', settings.daysEnabled[4]);
     $('#settingsDayFriday').prop('checked', settings.daysEnabled[5]);
     $('#settingsDaySaturday').prop('checked', settings.daysEnabled[6]);
+    $('#experimentalScaling').prop('checked', settings.experimentalScaling);
 
     $('#settingsModal').modal('show');
 });
@@ -1168,7 +1172,7 @@ $('#settingsButton').on('click', function () {
  * Handler for the changing of day checkboxes in the settings modal
  * Sets the correct values in settings
  */
-$('.settings-day').on('change', function(event) {
+$('.settings-ui').on('change', function(event) {
     var value = $(this).val();
     var checked = $(this).prop('checked');
     
@@ -1193,6 +1197,9 @@ $('.settings-day').on('change', function(event) {
             break;
         case 'saturday':
             settings.daysEnabled[6] = checked;
+            break;
+        case 'experimentalScaling':
+            settings.experimentalScaling = checked;
             break;
     }
 
